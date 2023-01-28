@@ -314,7 +314,7 @@ button {
      align-items: center;
      position: relative;
 }
-
+/*
 .banner_main::before {
      position: absolute;
      bottom: -63px;
@@ -326,7 +326,7 @@ button {
      z-index: 9999;
      height: 159px;
      cursor: pointer;
-}
+}*/
 
 .text-bg {
      text-align: left;
@@ -539,7 +539,7 @@ button {
 /** services section **/
 
 .services .titlepage {
-     text-align: left;
+     text-align: center;
 }
 
 .services {
