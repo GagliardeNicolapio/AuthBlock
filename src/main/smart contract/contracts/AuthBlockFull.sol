@@ -1,5 +1,5 @@
 pragma solidity ^0;
-
+pragma experimental ABIEncoderV2;
 
 contract AuthBlockFull{
     struct  InfoAccessoSito{

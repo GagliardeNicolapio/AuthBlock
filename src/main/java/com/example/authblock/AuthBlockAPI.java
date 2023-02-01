@@ -5,6 +5,10 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import org.springframework.web.bind.annotation.*;
+import org.web3j.crypto.Credentials;
+import org.web3j.protocol.Web3j;
+import org.web3j.protocol.http.HttpService;
+import org.web3j.tx.gas.DefaultGasProvider;
 
 import javax.crypto.*;
 import javax.crypto.spec.SecretKeySpec;
@@ -30,12 +34,13 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
 @RestController
 @RequestMapping(value = "/api", method = POST)
 public class AuthBlockAPI {
+    private static final String addressContract = "0x29b07eE82577e8169520e698684d619682F33ae7";
     private String keyMAC="chiave";
     private String algorithm = "HmacSHA256";
     private static final char[] HEX_ARRAY = "0123456789ABCDEF".toCharArray();
 
     @PostMapping(value = "", produces = "application/json")
-    public @ResponseBody String insertAccesso(@RequestBody String body)  {
+    public @ResponseBody String insertAccesso(@RequestBody String body) throws Exception {
         ArrayList<String> keysAccessoSito = new ArrayList<>(Arrays.asList("oraLogin", "oraLogout", "username", "userAgent", "ipAddress"));
         ArrayList<String> keysAccessoUtente = new ArrayList<>(Arrays.asList("oraLogin", "oraLogout", "url"));
 
@@ -54,40 +59,48 @@ public class AuthBlockAPI {
         JSONObject hmac = array.getJSONObject(3);
 
 
-
         //controllo gli indirizzi
-        try{
-            String indirizzoSito = checkData(indirizzi.getString("ethSite"), hmacIndirizzi.getString("ethSite"));
-            String indirizzoUtente = checkData(indirizzi.getString("ethUser"), hmacIndirizzi.getString("ethUser"));
-        }catch (Exception e){
-            return e.getMessage()+"{field:\"address ethereum\"}";
+        String indirizzoSito;
+        String indirizzoUtente;
+        try {
+            indirizzoSito = checkData(indirizzi.getString("ethSite"), hmacIndirizzi.getString("ethSite"));
+            indirizzoUtente = checkData(indirizzi.getString("ethUser"), hmacIndirizzi.getString("ethUser"));
+        } catch (Exception e) {
+            return e.getMessage() + "{field:\"address ethereum\"}";
         }
 
-        InfoAccessoSitoBuilder infoAccessoSitoBuilder = new InfoAccessoSitoBuilder();
-        InfoAccessoUtenteBuilder infoAccessoUtenteBuilder = new InfoAccessoUtenteBuilder();
 
         //controllo oraLogin, logout, url e creo struttura per l'utente
-        try{
-            Contracts_AuthBlockFull_sol_AuthBlockFull.InfoAccessoUtente infoAccessoUtente = new InfoAccessoUtenteBuilder()
-                    .setOraLogin(checkData(data.getString("oraLogin"),hmac.getString("oraLogin")))
-                    .setOraLogout(checkData(data.getString("oraLogout"),hmac.getString("oraLogout")))
-                    .setUrl(checkData(data.getString("url"),hmac.getString("url"))).build();
-        }catch (Exception e){
-            return e.getMessage()+"{field:\"user data\"}";
+        Contracts_AuthBlockFull_sol_AuthBlockFull.InfoAccessoUtente infoAccessoUtente;
+        try {
+            infoAccessoUtente = new InfoAccessoUtenteBuilder()
+                    .setOraLogin(checkData(data.getString("oraLogin"), hmac.getString("oraLogin")))
+                    .setOraLogout(checkData(data.getString("oraLogout"), hmac.getString("oraLogout")))
+                    .setUrl(checkData(data.getString("url"), hmac.getString("url"))).build();
+        } catch (Exception e) {
+            return e.getMessage() + "{field:\"user data\"}";
         }
 
-
-        try{
-            Contracts_AuthBlockFull_sol_AuthBlockFull.InfoAccessoSito infoAccessoSito = new InfoAccessoSitoBuilder()
-                    .setOraLogin(checkData(data.getString("oraLogin"),hmac.getString("oraLogin")))
-                    .setOraLogout(checkData(data.getString("oraLogout"),hmac.getString("oraLogout")))
-                    .setUsernameUtente(checkData(data.getString("username"),hmac.getString("username")))
-                    .setUserAgent(checkData(data.getString("userAgent"),hmac.getString("userAgent")))
-                    .setIpAddress(checkData(data.getString("ipAddress"),hmac.getString("ipAddress"))).build();
-        }catch (Exception e){
-            return e.getMessage()+"{field:\"data site\"}";
+        //controllo oraLogin, logout, username, useragent e ip
+        Contracts_AuthBlockFull_sol_AuthBlockFull.InfoAccessoSito infoAccessoSito;
+        try {
+             infoAccessoSito = new InfoAccessoSitoBuilder()
+                    .setOraLogin(checkData(data.getString("oraLogin"), hmac.getString("oraLogin")))
+                    .setOraLogout(checkData(data.getString("oraLogout"), hmac.getString("oraLogout")))
+                    .setUsernameUtente(checkData(data.getString("username"), hmac.getString("username")))
+                    .setUserAgent(checkData(data.getString("userAgent"), hmac.getString("userAgent")))
+                    .setIpAddress(checkData(data.getString("ipAddress"), hmac.getString("ipAddress"))).build();
+        } catch (Exception e) {
+            return e.getMessage() + "{field:\"data site\"}";
         }
 
+        //salvo i dati in blockchain
+        //aCosaServeQuesta?
+        //per il VM Exception while processing transaction: revert provare a commentare le require nel contratto .sol
+        Credentials credentials = Credentials.create("1eb83689f509b075e6e359a7dd482e438b56b2a3cdbc4628aea4a81ff815c843");
+        System.out.println(new DefaultGasProvider().getGasLimit());
+        Contracts_AuthBlockFull_sol_AuthBlockFull contract = Contracts_AuthBlockFull_sol_AuthBlockFull.load(addressContract, Web3j.build(new HttpService("http://172.19.203.76:7545")), credentials,new DefaultGasProvider());
+        contract.insertAccesso(indirizzoSito, indirizzoUtente, infoAccessoSito, infoAccessoUtente).send();
         return "{result:ok}";
     }
 
