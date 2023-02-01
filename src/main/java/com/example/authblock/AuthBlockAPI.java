@@ -35,33 +35,69 @@ public class AuthBlockAPI {
     private static final char[] HEX_ARRAY = "0123456789ABCDEF".toCharArray();
 
     @PostMapping(value = "", produces = "application/json")
-    public @ResponseBody String insertAccesso(@RequestBody String body) throws Exception {
-        ArrayList<String> keys = new ArrayList<>(Arrays.asList("oraLogin", "oraLogout", "username", "userAgent", "ipAddress"));
-        System.out.println(body);
+    public @ResponseBody String insertAccesso(@RequestBody String body)  {
+        ArrayList<String> keysAccessoSito = new ArrayList<>(Arrays.asList("oraLogin", "oraLogout", "username", "userAgent", "ipAddress"));
+        ArrayList<String> keysAccessoUtente = new ArrayList<>(Arrays.asList("oraLogin", "oraLogout", "url"));
+
         JSONArray array = new JSONArray(body);
-        JSONObject data = array.getJSONObject(0);
-        JSONObject hmac = array.getJSONObject(1);
+
+        //indirizzi ethereum
+        JSONObject indirizzi = array.getJSONObject(0);
+
+        //hmac degli indirizzi ethereum
+        JSONObject hmacIndirizzi = array.getJSONObject(1);
+
+        //oraLogin, logout, username, userAgent, ip, url
+        JSONObject data = array.getJSONObject(2);
+
+        //hmac di oraLogin, logout, username, userAgent, ip, url
+        JSONObject hmac = array.getJSONObject(3);
 
 
-        for (String key : keys) {
-            String fieldData = data.getString(key);
-            String fieldHmac = hmac.getString(key);
-            String decData =  decryptRSA(fieldData);
-            System.out.println(fieldData+": "+decData);
-            String decHmac = decryptRSA(fieldHmac);
-            if(!hmac(decData).equals(decHmac))
-                return "{error:\"hmac failed\"}";
+
+        //controllo gli indirizzi
+        try{
+            String indirizzoSito = checkData(indirizzi.getString("ethSite"), hmacIndirizzi.getString("ethSite"));
+            String indirizzoUtente = checkData(indirizzi.getString("ethUser"), hmacIndirizzi.getString("ethUser"));
+        }catch (Exception e){
+            return e.getMessage()+"{field:\"address ethereum\"}";
+        }
+
+        InfoAccessoSitoBuilder infoAccessoSitoBuilder = new InfoAccessoSitoBuilder();
+        InfoAccessoUtenteBuilder infoAccessoUtenteBuilder = new InfoAccessoUtenteBuilder();
+
+        //controllo oraLogin, logout, url e creo struttura per l'utente
+        try{
+            Contracts_AuthBlockFull_sol_AuthBlockFull.InfoAccessoUtente infoAccessoUtente = new InfoAccessoUtenteBuilder()
+                    .setOraLogin(checkData(data.getString("oraLogin"),hmac.getString("oraLogin")))
+                    .setOraLogout(checkData(data.getString("oraLogout"),hmac.getString("oraLogout")))
+                    .setUrl(checkData(data.getString("url"),hmac.getString("url"))).build();
+        }catch (Exception e){
+            return e.getMessage()+"{field:\"user data\"}";
         }
 
 
-
-
-
-
+        try{
+            Contracts_AuthBlockFull_sol_AuthBlockFull.InfoAccessoSito infoAccessoSito = new InfoAccessoSitoBuilder()
+                    .setOraLogin(checkData(data.getString("oraLogin"),hmac.getString("oraLogin")))
+                    .setOraLogout(checkData(data.getString("oraLogout"),hmac.getString("oraLogout")))
+                    .setUsernameUtente(checkData(data.getString("username"),hmac.getString("username")))
+                    .setUserAgent(checkData(data.getString("userAgent"),hmac.getString("userAgent")))
+                    .setIpAddress(checkData(data.getString("ipAddress"),hmac.getString("ipAddress"))).build();
+        }catch (Exception e){
+            return e.getMessage()+"{field:\"data site\"}";
+        }
 
         return "{result:ok}";
     }
 
+
+    private String checkData(String dataEnc, String hmacEnc) throws Exception {
+        String dataDec = decryptRSA(dataEnc);
+        if(!decryptRSA(hmacEnc).equals(hmac(dataDec)))
+            throw new Exception("{error:\"hmac failed\"}");
+        return dataDec;
+    }
 
     private String hmac(String data) throws Exception {
 
@@ -95,5 +131,57 @@ public class AuthBlockAPI {
             hexChars[j * 2 + 1] = HEX_ARRAY[v & 0x0F];
         }
         return new String(hexChars);
+    }
+
+    private class InfoAccessoSitoBuilder{
+        private String oraLogin, oraLogout, usernameUtente, userAgentUtente, indirizzoIPUtente;
+        public InfoAccessoSitoBuilder(){}
+
+        public InfoAccessoSitoBuilder setOraLogin(String oraLogin){
+            this.oraLogin = oraLogin;
+            return this;
+        }
+        public InfoAccessoSitoBuilder setOraLogout(String oraLogout){
+            this.oraLogout = oraLogout;
+            return this;
+        }
+        public InfoAccessoSitoBuilder setUsernameUtente(String username){
+            this.usernameUtente = username;
+            return this;
+        }
+        public InfoAccessoSitoBuilder setUserAgent(String userAgent){
+            this.userAgentUtente = userAgent;
+            return this;
+        }
+        public InfoAccessoSitoBuilder setIpAddress(String ip){
+            this.indirizzoIPUtente = ip;
+            return this;
+        }
+        public Contracts_AuthBlockFull_sol_AuthBlockFull.InfoAccessoSito build(){
+            return new Contracts_AuthBlockFull_sol_AuthBlockFull.InfoAccessoSito(oraLogin,oraLogout,usernameUtente,userAgentUtente,indirizzoIPUtente);
+        }
+    }
+
+    private class InfoAccessoUtenteBuilder{
+        private String oraLogin, oraLogout, url;
+
+        public InfoAccessoUtenteBuilder(){}
+
+        public InfoAccessoUtenteBuilder setOraLogin(String oraLogin){
+            this.oraLogin = oraLogin;
+            return this;
+        }
+        public InfoAccessoUtenteBuilder setOraLogout(String oraLogout){
+            this.oraLogout = oraLogout;
+            return this;
+        }
+        public InfoAccessoUtenteBuilder setUrl(String url){
+            this.url = url;
+            return this;
+        }
+
+        public Contracts_AuthBlockFull_sol_AuthBlockFull.InfoAccessoUtente build(){
+            return new Contracts_AuthBlockFull_sol_AuthBlockFull.InfoAccessoUtente(url, oraLogin, oraLogout);
+        }
     }
 }
