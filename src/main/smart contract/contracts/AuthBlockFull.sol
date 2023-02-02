@@ -24,15 +24,30 @@ contract AuthBlockFull{
     //associa a un indirizzo di un utente un array di struct che contengono le info dei siti visitati dall'utente
     mapping(address => InfoAccessoUtente[]) utenti;
 
-    function insertAccesso(address indirizzoSito, address indirizzoUtente, InfoAccessoSito memory infoAccessoSito, InfoAccessoUtente memory infoAccessoUtente) public{
-        require(isAccount(indirizzoSito) && isAccount(indirizzoUtente));
-        sitiWeb[indirizzoSito].push(infoAccessoSito);
-        utenti[indirizzoUtente].push(infoAccessoUtente);
+
+    //nota: passare le strutture come parametro è una cosa sperimentale, infatti bisogna usare pragma experimental ABIEncoderV2; e NON funziona
+    function insertAccesso(address _indirizzoSito, address _indirizzoUtente, string[] memory _dataInfoAccessoSito, string[] memory _dataInfoAccessoUtente) public{
+        // require(isAccount(indirizzoSito) && isAccount(indirizzoUtente), "Error address");
+        InfoAccessoSito memory sito = InfoAccessoSito(_dataInfoAccessoSito[0],_dataInfoAccessoSito[1],_dataInfoAccessoSito[2],_dataInfoAccessoSito[3],_dataInfoAccessoSito[4]);
+        InfoAccessoUtente memory utente = InfoAccessoUtente(_dataInfoAccessoUtente[0],_dataInfoAccessoUtente[2],_dataInfoAccessoUtente[2]);
+
+        sitiWeb[_indirizzoSito].push(sito);
+        utenti[_indirizzoUtente].push(utente);
     }
 
-    function isAccount(address addr) private view returns (bool) {
+    function getNumberAccessiSito(address indirizzoSito) public view returns(uint){
+        return sitiWeb[indirizzoSito].length;
+    }
+
+    function getInfoAccessoSito(address indirizzoSito, uint accessNumber) public view returns(string memory){
+        InfoAccessoSito memory accesso = sitiWeb[indirizzoSito][accessNumber];
+        return string(abi.encodePacked(accesso.oraLogin, accesso.oraLogout, accesso.usernameUtente, accesso.userAgentUtente, accesso.indirizzoIPUtente));
+    //    return "{oraLogin:"+accesso.oraLogin+", oraLogout:"+accesso.oraLogout+", username:"+accesso.usernameUtente+", userAgent:"+accesso.userAgentUtente+", ipAddress:"+accesso.indirizzoIPUtente+"}";
+    }
+
+   /* function isAccount(address addr) private view returns (bool) {
         uint size;
         assembly { size := extcodesize(addr) }
         return size <= 0;
-    }
+    }*/
 }

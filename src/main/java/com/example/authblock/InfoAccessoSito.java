@@ -1,0 +1,91 @@
+package com.example.authblock;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+
+public class InfoAccessoSito {
+    private String oraLogin, oraLogout, usernameUtente, userAgentUtente, indirizzoIPUtente;
+
+    private InfoAccessoSito(String oraLogin, String oraLogout, String usernameUtente, String userAgentUtente, String indirizzoIPUtente) {
+        this.oraLogin = oraLogin;
+        this.oraLogout = oraLogout;
+        this.usernameUtente = usernameUtente;
+        this.userAgentUtente = userAgentUtente;
+        this.indirizzoIPUtente = indirizzoIPUtente;
+    }
+
+    public String getOraLogin() {
+        return oraLogin;
+    }
+
+    public void setOraLogin(String oraLogin) {
+        this.oraLogin = oraLogin;
+    }
+
+    public String getOraLogout() {
+        return oraLogout;
+    }
+
+    public void setOraLogout(String oraLogout) {
+        this.oraLogout = oraLogout;
+    }
+
+    public String getUsernameUtente() {
+        return usernameUtente;
+    }
+
+    public void setUsernameUtente(String usernameUtente) {
+        this.usernameUtente = usernameUtente;
+    }
+
+    public String getUserAgentUtente() {
+        return userAgentUtente;
+    }
+
+    public void setUserAgentUtente(String userAgentUtente) {
+        this.userAgentUtente = userAgentUtente;
+    }
+
+    public String getIndirizzoIPUtente() {
+        return indirizzoIPUtente;
+    }
+
+    public void setIndirizzoIPUtente(String indirizzoIPUtente) {
+        this.indirizzoIPUtente = indirizzoIPUtente;
+    }
+
+    public ArrayList<String> getData(){
+        return new ArrayList<>(Arrays.asList(oraLogin, oraLogout, usernameUtente, userAgentUtente, indirizzoIPUtente));
+    }
+
+
+    public static class InfoAccessoSitoBuilder{
+        private String oraLogin, oraLogout, usernameUtente, userAgentUtente, indirizzoIPUtente;
+        public InfoAccessoSitoBuilder(){}
+
+        public InfoAccessoSitoBuilder setOraLogin(String oraLogin){
+            this.oraLogin = oraLogin;
+            return this;
+        }
+        public InfoAccessoSitoBuilder setOraLogout(String oraLogout){
+            this.oraLogout = oraLogout;
+            return this;
+        }
+        public InfoAccessoSitoBuilder setUsernameUtente(String username){
+            this.usernameUtente = username;
+            return this;
+        }
+        public InfoAccessoSitoBuilder setUserAgent(String userAgent){
+            this.userAgentUtente = userAgent;
+            return this;
+        }
+        public InfoAccessoSitoBuilder setIpAddress(String ip){
+            this.indirizzoIPUtente = ip;
+            return this;
+        }
+        public InfoAccessoSito build(){
+            return new InfoAccessoSito(oraLogin,oraLogout,usernameUtente,userAgentUtente,indirizzoIPUtente);
+        }
+    }
+
+}

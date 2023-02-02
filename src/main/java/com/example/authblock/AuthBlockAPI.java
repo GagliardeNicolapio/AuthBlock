@@ -1,6 +1,5 @@
 package com.example.authblock;
 
-import jakarta.servlet.http.HttpServletRequest;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -14,6 +13,7 @@ import javax.crypto.*;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.File;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.security.InvalidKeyException;
@@ -23,10 +23,8 @@ import java.security.PrivateKey;
 import java.security.spec.EncodedKeySpec;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
-import java.security.spec.X509EncodedKeySpec;
 import java.util.*;
 
-import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 
@@ -34,7 +32,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
 @RestController
 @RequestMapping(value = "/api", method = POST)
 public class AuthBlockAPI {
-    private static final String addressContract = "0x29b07eE82577e8169520e698684d619682F33ae7";
+    private static final String addressContract = "0x5f147Ce595215eE9345D87bb8A0FA9f688B485B6";
     private String keyMAC="chiave";
     private String algorithm = "HmacSHA256";
     private static final char[] HEX_ARRAY = "0123456789ABCDEF".toCharArray();
@@ -71,9 +69,9 @@ public class AuthBlockAPI {
 
 
         //controllo oraLogin, logout, url e creo struttura per l'utente
-        Contracts_AuthBlockFull_sol_AuthBlockFull.InfoAccessoUtente infoAccessoUtente;
+      InfoAccessoUtente infoAccessoUtente;
         try {
-            infoAccessoUtente = new InfoAccessoUtenteBuilder()
+            infoAccessoUtente = new InfoAccessoUtente.InfoAccessoUtenteBuilder()
                     .setOraLogin(checkData(data.getString("oraLogin"), hmac.getString("oraLogin")))
                     .setOraLogout(checkData(data.getString("oraLogout"), hmac.getString("oraLogout")))
                     .setUrl(checkData(data.getString("url"), hmac.getString("url"))).build();
@@ -82,9 +80,9 @@ public class AuthBlockAPI {
         }
 
         //controllo oraLogin, logout, username, useragent e ip
-        Contracts_AuthBlockFull_sol_AuthBlockFull.InfoAccessoSito infoAccessoSito;
+        InfoAccessoSito infoAccessoSito;
         try {
-             infoAccessoSito = new InfoAccessoSitoBuilder()
+             infoAccessoSito = new InfoAccessoSito.InfoAccessoSitoBuilder()
                     .setOraLogin(checkData(data.getString("oraLogin"), hmac.getString("oraLogin")))
                     .setOraLogout(checkData(data.getString("oraLogout"), hmac.getString("oraLogout")))
                     .setUsernameUtente(checkData(data.getString("username"), hmac.getString("username")))
@@ -97,10 +95,15 @@ public class AuthBlockAPI {
         //salvo i dati in blockchain
         //aCosaServeQuesta?
         //per il VM Exception while processing transaction: revert provare a commentare le require nel contratto .sol
-        Credentials credentials = Credentials.create("1eb83689f509b075e6e359a7dd482e438b56b2a3cdbc4628aea4a81ff815c843");
+        Credentials credentials = Credentials.create("856a0b665c53bc02366b0ec25d673bc835f02ea4ec6aa50fdc8676a9275bd988");
         System.out.println(new DefaultGasProvider().getGasLimit());
-        Contracts_AuthBlockFull_sol_AuthBlockFull contract = Contracts_AuthBlockFull_sol_AuthBlockFull.load(addressContract, Web3j.build(new HttpService("http://172.19.203.76:7545")), credentials,new DefaultGasProvider());
-        contract.insertAccesso(indirizzoSito, indirizzoUtente, infoAccessoSito, infoAccessoUtente).send();
+        Contracts_AuthBlockFull_sol_AuthBlockFull contract = Contracts_AuthBlockFull_sol_AuthBlockFull.load(addressContract, Web3j.build(new HttpService("http://172.19.204.23:7545")), credentials,new DefaultGasProvider());
+        contract.insertAccesso(indirizzoSito, indirizzoUtente, infoAccessoSito.getData(), infoAccessoUtente.getData()).send();
+
+
+        String x =  contract.getInfoAccessoSito(indirizzoSito, BigInteger.valueOf(0)).send();
+        System.out.println(x);
+        // contract.insertAccesso(indirizzoSito, indirizzoUtente, infoAccessoSito, infoAccessoUtente).send();
         return "{result:ok}";
     }
 
@@ -146,55 +149,4 @@ public class AuthBlockAPI {
         return new String(hexChars);
     }
 
-    private class InfoAccessoSitoBuilder{
-        private String oraLogin, oraLogout, usernameUtente, userAgentUtente, indirizzoIPUtente;
-        public InfoAccessoSitoBuilder(){}
-
-        public InfoAccessoSitoBuilder setOraLogin(String oraLogin){
-            this.oraLogin = oraLogin;
-            return this;
-        }
-        public InfoAccessoSitoBuilder setOraLogout(String oraLogout){
-            this.oraLogout = oraLogout;
-            return this;
-        }
-        public InfoAccessoSitoBuilder setUsernameUtente(String username){
-            this.usernameUtente = username;
-            return this;
-        }
-        public InfoAccessoSitoBuilder setUserAgent(String userAgent){
-            this.userAgentUtente = userAgent;
-            return this;
-        }
-        public InfoAccessoSitoBuilder setIpAddress(String ip){
-            this.indirizzoIPUtente = ip;
-            return this;
-        }
-        public Contracts_AuthBlockFull_sol_AuthBlockFull.InfoAccessoSito build(){
-            return new Contracts_AuthBlockFull_sol_AuthBlockFull.InfoAccessoSito(oraLogin,oraLogout,usernameUtente,userAgentUtente,indirizzoIPUtente);
-        }
-    }
-
-    private class InfoAccessoUtenteBuilder{
-        private String oraLogin, oraLogout, url;
-
-        public InfoAccessoUtenteBuilder(){}
-
-        public InfoAccessoUtenteBuilder setOraLogin(String oraLogin){
-            this.oraLogin = oraLogin;
-            return this;
-        }
-        public InfoAccessoUtenteBuilder setOraLogout(String oraLogout){
-            this.oraLogout = oraLogout;
-            return this;
-        }
-        public InfoAccessoUtenteBuilder setUrl(String url){
-            this.url = url;
-            return this;
-        }
-
-        public Contracts_AuthBlockFull_sol_AuthBlockFull.InfoAccessoUtente build(){
-            return new Contracts_AuthBlockFull_sol_AuthBlockFull.InfoAccessoUtente(url, oraLogin, oraLogout);
-        }
-    }
 }
