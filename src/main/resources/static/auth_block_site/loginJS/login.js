@@ -31,7 +31,11 @@ function logout() {
     window.localStorage.removeItem("userAddress");
     showAddress();
 }
-
+function control(){
+    let address = document.getElementById("addressEther")
+    let result = window.Web3.utils.isAddress(address)
+    window.alert(result) // => true
+}
 // Login with Web3 via Metamasks window.ethereum library
 async function loginWithEth() {
     if (window.web3) {
@@ -48,7 +52,7 @@ async function loginWithEth() {
                 });
             window.userAddress = selectedAccount;
             window.localStorage.setItem("userAddress", selectedAccount);
-            showAddress();
+            document.getElementById("addressEther").value = selectedAccount
         } catch (error) {
             console.error(error);
         }

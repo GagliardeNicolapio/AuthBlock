@@ -87,7 +87,7 @@ public class AuthBlockAPI {
         return new String(decryptedMessageBytes, StandardCharsets.UTF_8);
     }
 
-    private String bytesToHex(byte[] bytes) {
+    public String bytesToHex(byte[] bytes) {
         char[] hexChars = new char[bytes.length * 2];
         for (int j = 0; j < bytes.length; j++) {
             int v = bytes[j] & 0xFF;
