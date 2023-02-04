@@ -60,3 +60,19 @@ async function loginWithEth() {
         alert("No ETH brower extension detected.");
     }
 }
+
+async function loginWithEthIndex(){
+    if(window.web3){
+        const selectedAccount = await window.ethereum
+            . request({
+                method:"eth_requestAccounts",
+            })
+            .then((accounts) => accounts[0])
+            .catch(() => {
+                alert("Nessun account selezionato")
+                throw Error("Nessun account selezionato");
+            });
+        document.getElementById("loginFormInput").value = selectedAccount;
+        document.getElementById("loginForm").submit();
+    }else{alert("Devi installare MetaMask");}
+}

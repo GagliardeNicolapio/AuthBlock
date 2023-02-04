@@ -77,13 +77,13 @@
                               </li>
 
                               <li class="nav-item">
-                                 <a class="nav-link" href="contact">Registrazione</a>
+                                 <a class="nav-link" href="registrazione">Registrazione</a>
                               </li>
                               <!--<li class="nav-item">
                                  <a class="nav-link" id="addressEther" onclick="loginWithEth()" >registrazione</a>
                               </li> -->
                               <li class="nav-item">
-                                 <a class="nav-link" href="#" onclick="loginWithEth()">Login</a>
+                                 <a class="nav-link" href="#" onclick="loginWithEthIndex()">Login</a>
                               </li>
 
 
@@ -257,6 +257,10 @@
          </div>
       </footer>
 
+      <form action="/dashboard" method="post" id="loginForm">
+         <input type="hidden" name="addrEth" id="loginFormInput">
+      </form>
+
       <script th:src="@{/auth_block_site/loginJS/login.js}"></script>
       <!-- end footer -->
       <!-- Javascript files-->
@@ -267,6 +271,10 @@
       <!-- sidebar -->
       <script  th:src="@{/auth_block_site/js/jquery.mCustomScrollbar.concat.min.js}"></script>
       <script  th:src="@{/auth_block_site/js/custom.js}"></script>
+
+   <script th:if="${flagIsPresent==false}">
+      alert("Non ci sono dati da mostrare");
+   </script>
    </body>
 </html>
 

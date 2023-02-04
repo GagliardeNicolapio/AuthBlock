@@ -1,21 +1,14 @@
-package com.example.authblock;
+package com.example.authblock.site;
+import com.example.authblock.chain.UtilsChain;
+import com.example.authblock.cryptography.UtilsCrypto;
 import jakarta.servlet.http.HttpServletRequest;
 import org.json.JSONObject;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
-import org.thymeleaf.model.IModel;
-
-import javax.crypto.KeyGenerator;
-import javax.crypto.SecretKey;
-import javax.swing.*;
-
 import java.io.FileWriter;
 import java.io.IOException;
-import java.security.PrivateKey;
 
-import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
 @Controller
 @RequestMapping(value = "")
@@ -43,11 +36,11 @@ public class SiteController {
     @PostMapping("/download")
     public String download(@RequestParam("addressEther") String addressEth, HttpServletRequest request, Model model) throws Exception {
         FileWriter file;
-        Utils indirizzo = new Utils();
+
         // verifico se l'indirizzo è sintatticamente valido
-        if(indirizzo.isAddress(addressEth)){
+        if(UtilsChain.isAddress(addressEth)){
             //genero la chiave
-            String key = indirizzo.generatekey();
+            String key = UtilsCrypto.generatekey();
             // creo un oggetto json nel quale salvare la coppia indirizzo:chiave
             JSONObject obj = new JSONObject();
             obj.put(addressEth, key);

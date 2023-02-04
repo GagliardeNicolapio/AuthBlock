@@ -1,14 +1,14 @@
-package com.example.authblock;
+package com.example.authblock.chain;
 
 import org.bouncycastle.jcajce.provider.digest.SHA3;
 import org.bouncycastle.util.encoders.Hex;
 
-import javax.crypto.KeyGenerator;
-import javax.crypto.SecretKey;
-import java.security.NoSuchAlgorithmException;
+public class UtilsChain {
 
-public class Utils {
-    private AuthBlockAPI binEsa = new AuthBlockAPI();
+    public static String truncateAddress(String address){
+        return address.substring(0,5)+"..."+address.substring(address.length()-5);
+    }
+
     /* input : Indirizzo
      * Uscita: vero o falso
      * scopo: convalidare un checksum un indirizzo Ethereum
@@ -20,12 +20,8 @@ public class Utils {
      * URL di riferimento: https://github.com/ethereum/EIPs/issues/55
      */
 
-    public String generatekey() throws NoSuchAlgorithmException {
-        KeyGenerator keyGen = KeyGenerator.getInstance("HmacSHA256");
-        keyGen.init(256); // for example
-        return binEsa.bytesToHex(keyGen.generateKey().getEncoded());
-    }
-    public static boolean isAddress(String addr) throws NoSuchAlgorithmException {
+
+    public static boolean isAddress(String addr){
         //Print for testing purpose and more verbose output
         System.out.println("Incoming Address " + addr);
 

@@ -5,7 +5,7 @@ import java.util.Arrays;
 
 public class InfoAccessoUtente {
     private String oraLogin, oraLogout, url;
-    private InfoAccessoUtente(String oraLogin, String oraLogout, String url){
+    private InfoAccessoUtente( String url, String oraLogin, String oraLogout){
         this.oraLogin = oraLogin;
         this.oraLogout = oraLogout;
         this.url = url;
