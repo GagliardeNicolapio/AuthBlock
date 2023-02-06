@@ -13,16 +13,25 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 
 public class AuthBlockChain {
-    private static final String addressContract = "0x99138f7Ef502d220c26c9EC195FdB0a4371271f0";
-    private static Credentials credentials = Credentials.create("42dda2b2f8838108f43e664733f0e64aa70a92bf0cacf2de2ce5975a1806e262");
+    private static final String addressContract = "0x0d3416a8d40B4b15208Bb9807Cc31D68E5Abe68C";
+    private static final Credentials credentials = Credentials.create("cf0c0f5f13fd3cd6efcca4289c19f642b937cb999a7809476d064a0b9c8d8261");
     private static Contracts_AuthBlockFull_sol_AuthBlockFull contract;
+    private static final String url = "http://172.19.214.32:7545";
 
     public AuthBlockChain(){
-        contract = Contracts_AuthBlockFull_sol_AuthBlockFull.load(addressContract, Web3j.build(new HttpService("http://192.168.1.250:7545")), credentials,new DefaultGasProvider());
+        contract = Contracts_AuthBlockFull_sol_AuthBlockFull.load(addressContract, Web3j.build(new HttpService(url)), credentials,new DefaultGasProvider());
+    }
+
+    public boolean checkUser(String indirizzoSito, String indirizzoUtente) throws Exception {
+        return contract.checkUser(indirizzoSito,indirizzoUtente).send();
     }
 
     public void insertAccesso(String indirizzoSito, String indirizzoUtente, InfoAccessoSito infoAccessoSito, InfoAccessoUtente infoAccessoUtente) throws Exception {
         contract.insertAccesso(indirizzoSito, indirizzoUtente, infoAccessoSito.getData(), infoAccessoUtente.getData()).send();
+    }
+
+    public void insertNewUser(String indirizzoSito, String indirizzoUtente, InfoAccessoSito infoAccessoSito, InfoAccessoUtente infoAccessoUtente) throws Exception {
+        contract.insertUser(indirizzoSito, indirizzoUtente, infoAccessoSito.getData(), infoAccessoUtente.getData()).send();
     }
 
     public int getNumberAccessiSito(String indirizzoSito) throws Exception {

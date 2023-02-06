@@ -10,13 +10,24 @@ import org.springframework.web.bind.annotation.*;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 
-
+//NOTA: dovremmo cifrare anche i return
 @RestController
 @RequestMapping(value = "/api", method = POST)
 public class AuthBlockAPI {
 
+    @PostMapping(value = "/checkUser", produces = "application/json")
+    public @ResponseBody String checkUser(@RequestBody String body) throws Exception {
+        JSONObject object = new JSONObject(body);
+        boolean flag = new AuthBlockChain()
+                .checkUser(UtilsCrypto.checkData(object.getString("indirizzoSito"), object.getString("indirizzoSitoHmac")),
+                        UtilsCrypto.checkData(object.getString("indirizzoUtente"), object.getString("indirizzoUtenteHmac")));
+        if(flag)
+            return "{result:true}";
+        else return "{result:false}";
+    }
+
     @PostMapping(value = "", produces = "application/json")
-    public @ResponseBody String insertAccesso(@RequestBody String body) throws Exception {
+    public @ResponseBody String insertAccesso(@RequestBody String body, @RequestParam("newUser") boolean newUser) throws Exception {
 
         JSONArray array = new JSONArray(body);
 
@@ -70,7 +81,10 @@ public class AuthBlockAPI {
 
         //salvo i dati in blockchain
         try{
-            new AuthBlockChain().insertAccesso(indirizzoSito, indirizzoUtente, infoAccessoSito, infoAccessoUtente);
+            if(newUser)
+                new AuthBlockChain().insertNewUser(indirizzoSito,indirizzoUtente, infoAccessoSito, infoAccessoUtente);
+            else
+                new AuthBlockChain().insertAccesso(indirizzoSito, indirizzoUtente, infoAccessoSito, infoAccessoUtente);
         }catch (Exception e){
             return "{error:\"insert accesso failed\"}";
         }
