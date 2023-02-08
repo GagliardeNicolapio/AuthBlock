@@ -2,6 +2,7 @@
 pragma solidity ^0;
 pragma experimental ABIEncoderV2;
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/Strings.sol";
 
 /******************************************************************************************************************
 *   AuthBlockFull.sol
@@ -26,10 +27,12 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract AuthBlockFull is Ownable{
 
+    event InserimentoAccessoFatto(address indirizzoSito, address indirizzoUtente ,uint idAccessoSito, uint idAccessoUtente);
+
     //informazioni riguardo gli utenti del sito
     struct  InfoAccessoSito{
-        string oraLogin; //ora login e logout dell'utente
-        string oraLogout;
+        uint oraLogin; //ora login e logout dell'utente
+        uint oraLogout;
         string usernameUtente;
         string userAgentUtente; //info del browser utente
         string indirizzoIPUtente;
@@ -38,8 +41,8 @@ contract AuthBlockFull is Ownable{
     //informazioni riguardo i siti visitati da un utente
     struct InfoAccessoUtente{
         string urlSito;
-        string oraLogin;//capire come non duplicare oraLogin e oreLogout
-        string oraLogout;
+        uint oraLogin;//capire come non duplicare oraLogin e oreLogout
+        uint oraLogout;
     }
 
 
@@ -59,6 +62,17 @@ contract AuthBlockFull is Ownable{
 Metodi invocabili solo da AuthBlock
 *************************************************************************************************************************************************/
 
+    function insertLogout(address _indirizzoSito, address _indirizzoUtente, uint idInfoSito, uint idInfoUtente) public onlyOwner{
+        require(idInfoSito < infoPerSitiWeb[_indirizzoSito].length);
+        require(idInfoUtente < infoPerUtenti[_indirizzoUtente].length);
+        require(infoPerUtenti[_indirizzoUtente][idInfoUtente].oraLogout == 0);
+        require(infoPerSitiWeb[_indirizzoSito][idInfoSito].oraLogout == 0);
+
+        uint logout = block.timestamp;
+        infoPerSitiWeb[_indirizzoSito][idInfoSito].oraLogout = logout;
+        infoPerUtenti[_indirizzoUtente][idInfoUtente].oraLogout = logout;
+    }
+
     //Da invocare quando un sito vuole registrare un nuovo utente
     //inserisce un nuovo utente con indirizzo _indirizzoUtente del sito _indirizzoSito
     function insertUser(address _indirizzoSito, address _indirizzoUtente, string[] memory _dataInfoAccessoSito, string[] memory _dataInfoAccessoUtente) public onlyOwner{
@@ -72,10 +86,14 @@ Metodi invocabili solo da AuthBlock
     //inserisce i dati della login
     function insertAccesso(address _indirizzoSito, address _indirizzoUtente, string[] memory _dataInfoAccessoSito, string[] memory _dataInfoAccessoUtente) public onlyOwner{
         // require(isAccount(indirizzoSito) && isAccount(indirizzoUtente), "Error address");
-        InfoAccessoSito memory sito = InfoAccessoSito(_dataInfoAccessoSito[0],_dataInfoAccessoSito[1],utentiDeiSiti[_indirizzoSito][_indirizzoUtente],_dataInfoAccessoSito[3],_dataInfoAccessoSito[4]);
-        InfoAccessoUtente memory utente = InfoAccessoUtente(_dataInfoAccessoUtente[0],_dataInfoAccessoUtente[1],_dataInfoAccessoUtente[2]);
+        uint loginDate = block.timestamp;
+        InfoAccessoSito memory sito = InfoAccessoSito(loginDate, 0,utentiDeiSiti[_indirizzoSito][_indirizzoUtente],_dataInfoAccessoSito[1],_dataInfoAccessoSito[2]);
+        InfoAccessoUtente memory utente = InfoAccessoUtente(_dataInfoAccessoUtente[0],loginDate, 0);
         infoPerSitiWeb[_indirizzoSito].push(sito);
         infoPerUtenti[_indirizzoUtente].push(utente);
+        emit InserimentoAccessoFatto(_indirizzoSito, _indirizzoUtente, infoPerSitiWeb[_indirizzoSito].length-1, infoPerUtenti[_indirizzoUtente].length-1);
+        //return (infoPerSitiWeb[_indirizzoSito].length-1, infoPerUtenti[_indirizzoUtente].length-1);
+       // return string.concat("(",Strings.toString(infoPerSitiWeb[_indirizzoSito].length-1),",",Strings.toString(infoPerUtenti[_indirizzoUtente].length-1),")");
     }
 
     //dato un sito ritorna l'i-esimo accesso in formato json
@@ -111,9 +129,9 @@ Metodi invocabili solo da AuthBlock
     }
 
 
-    /*********************************************************************************************************************************************************
-    Metodi invocabili da qualsiasi account/contratto
-    *********************************************************************************************************************************************************/
+/*********************************************************************************************************************************************************
+Metodi invocabili da qualsiasi account/contratto
+*********************************************************************************************************************************************************/
 
     //ritorna il numero di accessi al sito
     function getNumberAccessiSito(address indirizzoSito) public view returns(uint){
@@ -142,12 +160,12 @@ Metodi invocabili solo da AuthBlock
 *********************************************************************************************************************************************************/
     //converte un InfoAccessoUtente in json
     function accessoUtenteToString(InfoAccessoUtente memory _accesso) private pure returns(string memory){
-        return string.concat('{urlSito:"', _accesso.urlSito, '",oraLogin:"', _accesso.oraLogin,'",oraLogout:"',_accesso.oraLogout,'"}');
+        return string.concat('{urlSito:"', _accesso.urlSito, '",oraLogin:"', Strings.toString(_accesso.oraLogin),'",oraLogout:"', Strings.toString(_accesso.oraLogout),'"}');
     }
 
     //converte un InfoAccessoSito in json
     function accessoSitoToString(InfoAccessoSito memory _accesso) private pure returns(string memory){
-        return string.concat('{oraLogin:"', _accesso.oraLogin,'", oraLogout:"', _accesso.oraLogout, '", username:"',
+        return string.concat('{oraLogin:"', Strings.toString(_accesso.oraLogin),'", oraLogout:"', Strings.toString(_accesso.oraLogout), '", username:"',
             _accesso.usernameUtente,'", userAgent:"', _accesso.userAgentUtente,'", ipAddress:"', _accesso.indirizzoIPUtente,'"}');
     }
 

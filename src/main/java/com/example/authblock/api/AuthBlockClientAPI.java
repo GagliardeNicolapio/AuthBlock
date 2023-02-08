@@ -30,16 +30,10 @@ public class AuthBlockClientAPI {
 
 
     public class Access{
-        private String oraLogin, oraLogout, username, userAgent, ipAddress, ethereumWebSite, ethereumUser, urlWebSite;
-        private String oraLoginMAC, oraLogoutMAC, usernameMAC, userAgentMAC, ipAddressMAC, ethereumWebSiteMAC, ethereumUserMAC, urlWebSiteMAC;
+        private String  oraLogout, username, userAgent, ipAddress, ethereumWebSite, ethereumUser, urlWebSite;
+        private String  oraLogoutMAC, usernameMAC, userAgentMAC, ipAddressMAC, ethereumWebSiteMAC, ethereumUserMAC, urlWebSiteMAC;
         public Access(){}
 
-        public Access setOraLogin(String oraLogin)throws Exception{
-            System.out.println("login");
-            this.oraLogin = rsa(oraLogin);
-            this.oraLoginMAC = rsa(hmac(oraLogin));
-            return this;
-        }
         public Access setOraLogout(String oraLogout)throws Exception{
             System.out.println("logout");
 
@@ -92,9 +86,9 @@ public class AuthBlockClientAPI {
 
         private String getData(){
             return "[{ethSite:\""+ethereumWebSite+"\",ethUser:\""+ethereumUser+"\"},{ethSite:\""+ethereumWebSiteMAC+"\",ethUser:\""+ethereumUserMAC+"\"}," +
-                    "{oraLogin:\""+oraLogin+"\",oraLogout:\""+
+                    "{oraLogout:\""+
                     oraLogout+"\",username:\""+username+"\",userAgent:\""+userAgent+"\",ipAddress:\""+ipAddress+"\",url:\""+urlWebSite+"\"}," +
-                    "{oraLogin:\""+oraLoginMAC+"\",oraLogout:\""+oraLogoutMAC+"\"," +
+                    "{oraLogout:\""+oraLogoutMAC+"\"," +
                     "username:\""+usernameMAC+"\",userAgent:\""+userAgentMAC+"\",ipAddress:\""+ipAddressMAC+"\",url:\""+urlWebSiteMAC+"\"}]";
         }
     }

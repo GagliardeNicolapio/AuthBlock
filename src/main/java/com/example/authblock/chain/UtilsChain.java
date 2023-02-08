@@ -3,7 +3,22 @@ package com.example.authblock.chain;
 import org.bouncycastle.jcajce.provider.digest.SHA3;
 import org.bouncycastle.util.encoders.Hex;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+import java.util.TimeZone;
+
 public class UtilsChain {
+
+    public static String secondsToStringDate(String seconds){
+        long millis =  Integer.parseInt(seconds) * 1000L;
+        Date date = new Date(millis);
+        SimpleDateFormat sdf = new SimpleDateFormat("EEEE d MMMM yyyy, h:mm", Locale.ITALIAN);
+        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+        String formattedDate = sdf.format(date);
+        System.out.println(formattedDate);
+        return formattedDate;
+    }
 
     public static String truncateAddress(String address){
         return address.substring(0,5)+"..."+address.substring(address.length()-5);

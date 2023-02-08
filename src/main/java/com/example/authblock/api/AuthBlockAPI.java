@@ -15,6 +15,18 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
 @RequestMapping(value = "/api", method = POST)
 public class AuthBlockAPI {
 
+    @PostMapping(value = "/logout", produces = "application/json")
+    public @ResponseBody String logout(@RequestBody String body) throws Exception {
+        JSONObject object = new JSONObject(body);
+        String indirizzoSito = UtilsCrypto.checkData(object.getString("sito"), object.getString("sitoHmac"));
+        System.out.println("api ind sito:" + indirizzoSito);
+        String indirizzoUtente = UtilsCrypto.checkData(object.getString("utente"), object.getString("utenteHmac"));
+        System.out.println("api ind utente:" + indirizzoUtente);
+
+        new AuthBlockChain().insertLogout(indirizzoSito,indirizzoUtente);
+        return "{result:ok}";
+    }
+
     @PostMapping(value = "/checkUser", produces = "application/json")
     public @ResponseBody String checkUser(@RequestBody String body) throws Exception {
         JSONObject object = new JSONObject(body);
@@ -59,8 +71,6 @@ public class AuthBlockAPI {
       InfoAccessoUtente infoAccessoUtente;
         try {
             infoAccessoUtente = new InfoAccessoUtente.InfoAccessoUtenteBuilder()
-                    .setOraLogin(UtilsCrypto.checkData(data.getString("oraLogin"), hmac.getString("oraLogin")))
-                    .setOraLogout(UtilsCrypto.checkData(data.getString("oraLogout"), hmac.getString("oraLogout")))
                     .setUrl(UtilsCrypto.checkData(data.getString("url"), hmac.getString("url"))).build();
         } catch (Exception e) {
             return "{field:\"user data\"}";
@@ -69,23 +79,31 @@ public class AuthBlockAPI {
         //controllo oraLogin, logout, username, useragent e ip
         InfoAccessoSito infoAccessoSito;
         try {
-             infoAccessoSito = new InfoAccessoSito.InfoAccessoSitoBuilder()
-                    .setOraLogin(UtilsCrypto.checkData(data.getString("oraLogin"), hmac.getString("oraLogin")))
-                    .setOraLogout(UtilsCrypto.checkData(data.getString("oraLogout"), hmac.getString("oraLogout")))
+            if(newUser)
+                infoAccessoSito = new InfoAccessoSito.InfoAccessoSitoBuilder()
                     .setUsernameUtente(UtilsCrypto.checkData(data.getString("username"), hmac.getString("username")))
                     .setUserAgent(UtilsCrypto.checkData(data.getString("userAgent"), hmac.getString("userAgent")))
                     .setIpAddress(UtilsCrypto.checkData(data.getString("ipAddress"), hmac.getString("ipAddress"))).build();
+            else
+                infoAccessoSito = new InfoAccessoSito.InfoAccessoSitoBuilder()
+                        .setUserAgent(UtilsCrypto.checkData(data.getString("userAgent"), hmac.getString("userAgent")))
+                        .setIpAddress(UtilsCrypto.checkData(data.getString("ipAddress"), hmac.getString("ipAddress"))).build();
         } catch (Exception e) {
             return "{field:\"data site\"}";
         }
 
         //salvo i dati in blockchain
         try{
+            System.out.println(newUser);
+            System.out.println(infoAccessoSito);
+            System.out.println(infoAccessoUtente);
+
             if(newUser)
                 new AuthBlockChain().insertNewUser(indirizzoSito,indirizzoUtente, infoAccessoSito, infoAccessoUtente);
             else
                 new AuthBlockChain().insertAccesso(indirizzoSito, indirizzoUtente, infoAccessoSito, infoAccessoUtente);
         }catch (Exception e){
+            System.out.println(e);
             return "{error:\"insert accesso failed\"}";
         }
         return "{result:ok}";

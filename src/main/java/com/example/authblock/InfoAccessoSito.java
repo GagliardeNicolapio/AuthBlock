@@ -14,21 +14,15 @@ public class InfoAccessoSito {
         this.indirizzoIPUtente = indirizzoIPUtente;
     }
 
-    public String getOraLogin() {
-        return oraLogin;
+    private InfoAccessoSito(String usernameUtente, String userAgentUtente, String indirizzoIPUtente) {
+        this.usernameUtente = usernameUtente;
+        this.userAgentUtente = userAgentUtente;
+        this.indirizzoIPUtente = indirizzoIPUtente;
     }
 
-    public void setOraLogin(String oraLogin) {
-        this.oraLogin = oraLogin;
-    }
+    public String getOraLogin(){return oraLogin;}
+    public String getOraLogout(){return oraLogout;}
 
-    public String getOraLogout() {
-        return oraLogout;
-    }
-
-    public void setOraLogout(String oraLogout) {
-        this.oraLogout = oraLogout;
-    }
 
     public String getUsernameUtente() {
         return usernameUtente;
@@ -55,22 +49,14 @@ public class InfoAccessoSito {
     }
 
     public ArrayList<String> getData(){
-        return new ArrayList<>(Arrays.asList(oraLogin, oraLogout, usernameUtente, userAgentUtente, indirizzoIPUtente));
+        return new ArrayList<>(Arrays.asList(usernameUtente, userAgentUtente, indirizzoIPUtente));
     }
 
 
     public static class InfoAccessoSitoBuilder{
-        private String oraLogin, oraLogout, usernameUtente, userAgentUtente, indirizzoIPUtente;
+        private String  usernameUtente, userAgentUtente, indirizzoIPUtente;
         public InfoAccessoSitoBuilder(){}
 
-        public InfoAccessoSitoBuilder setOraLogin(String oraLogin){
-            this.oraLogin = oraLogin;
-            return this;
-        }
-        public InfoAccessoSitoBuilder setOraLogout(String oraLogout){
-            this.oraLogout = oraLogout;
-            return this;
-        }
         public InfoAccessoSitoBuilder setUsernameUtente(String username){
             this.usernameUtente = username;
             return this;
@@ -84,8 +70,13 @@ public class InfoAccessoSito {
             return this;
         }
         public InfoAccessoSito build(){
-            return new InfoAccessoSito(oraLogin,oraLogout,usernameUtente,userAgentUtente,indirizzoIPUtente);
+            return new InfoAccessoSito(usernameUtente==null ? "" : usernameUtente,userAgentUtente,indirizzoIPUtente);
+        }
+
+        public InfoAccessoSito buildWithLoginLogout(String oraLogin, String oraLogout){
+            return new InfoAccessoSito(oraLogin, oraLogout, usernameUtente,userAgentUtente,indirizzoIPUtente);
         }
     }
+
 
 }
