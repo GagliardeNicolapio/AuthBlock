@@ -1,0 +1,108 @@
+<html>
+<head>
+    <style>
+        /* Material style */
+        button {
+            border: none;
+            cursor: pointer;
+            color: white;
+            padding: 15px 40px;
+            border-radius: 2px;
+            font-size: 22px;
+            box-shadow: 2px 2px 4px rgba(0, 0, 0, .4);
+            background: #2196F3;
+        }
+
+        /* Ripple magic */
+        button{
+            position: relative;
+            overflow: hidden;
+        }
+
+        button:after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 5px;
+            height: 5px;
+            background: rgba(255, 255, 255, .5);
+            opacity: 0;
+            border-radius: 100%;
+            transform: scale(1, 1) translate(-50%);
+            transform-origin: 50% 50%;
+        }
+
+        @keyframes ripple {
+            0% {
+                transform: scale(0, 0);
+                opacity: 1;
+            }
+            20% {
+                transform: scale(25, 25);
+                opacity: 1;
+            }
+            100% {
+                opacity: 0;
+                transform: scale(40, 40);
+            }
+        }
+
+        button:focus:not(:active)::after {
+            animation: ripple 1s ease-out;
+        }
+        .ratings {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            direction: rtl;
+            text-align: left;
+        }
+
+        .star {
+            position: relative;
+            line-height: 60px;
+            display: inline-block;
+            transition: color 0.2s ease;
+            color: #ebebeb;
+        }
+
+        .star:before {
+            content: '\2605';
+            width: 60px;
+            height: 60px;
+            font-size: 60px;
+        }
+
+        .star:hover,
+        .star.selected,
+        .star:hover ~ .star,
+        .star.selected ~ .star{
+            transition: color 0.8s ease;
+            color: yellow;
+        }
+
+        body
+        {   background-color: #E6E6FA;
+            width: 425px;
+            border-radius: 15px;
+        }
+    </style>
+
+</head>
+<body>
+
+
+<button id="enableEth" class="enableEthereumButton btn">Enable Ethereum</button>
+<button id="sendEth" class="sendEthButton btn">Send Eth</button>
+<ul class="ratings" id="media">
+    <li class="star" id = "5"></li>
+    <li class="star"  id = "4"></li>
+    <li class="star"  id = "3"></li>
+    <li class="star"  id = "2"></li>
+    <li class="star"  id = "1"></li>
+</ul>
+<script src="test.js"></script>
+</body>
+</html>
