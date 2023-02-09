@@ -1,5 +1,8 @@
-pragma solidity ^0.4.0;
+pragma solidity ^0;
 pragma experimental ABIEncoderV2;
+import "@openzeppelin/contracts/utils/Strings.sol";
+
+
 contract AuthBlockLite {
     uint media;
     uint divisore;
@@ -18,22 +21,22 @@ contract AuthBlockLite {
     //inserisci voto
     function insertVoto(address indirizzo, uint8 vot) public{
         uint prodotto;
-        require(vot > 1," Il voto è troppo basso ");
-        require(vot < 6,"IL voto è magiore di 5");
-        if(votoUtente[indirizzo].voto != 0){
-            add(10+20);
+        require(vot > 1," Il voto e' troppo basso ");
+        require(vot < 6,"IL voto e' magiore di 5");
+        if(votoUtente[indirizzo] != 0){
+            //add(10+20);
             prodotto = media * divisore;
-            prodotto -= votoUtente[indirizzo].voto;
+            prodotto -= votoUtente[indirizzo];
             media = (prodotto + vot)/divisore;
         }else{
-            votoUtente[indirizzo].voto = vot;
+            votoUtente[indirizzo] = vot;
             media = (media * divisore) + vot;
             divisore++;
             media /= divisore;
         }
     }
     // media
-    function getMedia() public view returns(uint8){
+    function getMedia() public view returns(uint){
         return media;
     }
     //nota: passare le strutture come parametro è una cosa sperimentale, infatti bisogna usare pragma experimental ABIEncoderV2; e NON funziona
@@ -41,17 +44,21 @@ contract AuthBlockLite {
         require(msg.value>=0.0005 ether, "error sender");
         // isAccount(indirizzo), "Error address");
         InfoAccesso memory infoAccesso = InfoAccesso(_dataInfoAccesso[0],_dataInfoAccesso[1]);
-        infoAccesso[indirizzo].push(infoAccesso);
+        infoAccessi[indirizzo].push(infoAccesso);
     }
     // prende l'indirizzo e torna l'array json di accessi associati a quell'indirizzo
     function getInfoAccesso(address indirizzo) public view returns(string memory){
         require(infoAccessi[indirizzo].length > 0, "non ha effettuato nessun accesso");
         string memory data = string.concat("[",accessoSitoToString(infoAccessi[indirizzo][0]));
         for(uint i=1; i<infoAccessi[indirizzo].length; i++){
-            data = string.concat(data,",",accessoSitoToString(infoPerSitiWeb[indirizzoSito][i]));
+            data = string.concat(data,",",accessoSitoToString(infoAccessi[indirizzo][i]));
         }
         data = string.concat(data,"]");
         return data;
+    }
+    //converte un InfoAccessoSito in json
+    function accessoSitoToString(InfoAccesso memory _accesso) private pure returns(string memory){
+        return string.concat('{oraLogin:"', _accesso.oraLogin,'", host:"',_accesso.host,'"}');
     }
 
 

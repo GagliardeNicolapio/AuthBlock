@@ -32,7 +32,7 @@ var ul = document.getElementById('media');
 ul.onclick = function(event) {
     var target = event.target;
     alert("Il voto inserito is: "+parseInt(target.getAttribute("id")));
-    injectVoto();
+    //injectVoto();
 
 };
 
@@ -45,7 +45,12 @@ document.addEventListener('DOMContentLoaded', function () {
 	
 	var button = document.getElementById('sendEth');
 	button.onclick = injectSendEth;
+
+    var ul = document.getElementById('media');
+    ul.onclick = injectVoto;
+
 });
+
 async function injectVoto(){
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
     await chrome.scripting.executeScript({
