@@ -22,7 +22,7 @@ x.innerText = "if(window.web3){alert('ok')}else{alert('nononono')}";
 document.getElementsByTagName("body")[0].appendChild(x);
 
 }
-loadFile2();*/
+loadFile2();
 
 
 
@@ -34,7 +34,7 @@ ul.onclick = function(event) {
     alert("Il voto inserito is: "+parseInt(target.getAttribute("id")));
     //injectVoto();
 
-};
+};*/
 
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -51,16 +51,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
 });
 
-async function injectVoto(){
-    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-    await chrome.scripting.executeScript({
-        world: 'MAIN',
-        target: { tabId: tab.id },
-        files: ['sendvoto.js']
-    });
-    window.close();
-
-}
 async function injectSendEth(){
 	 const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
     await chrome.scripting.executeScript({
@@ -79,4 +69,18 @@ async function injectScript() {
     files: ['enableEthereum.js']
     });
     window.close();
+}
+
+
+async function injectVoto(){
+    var target = event.target;
+    alert("Il voto inserito is: "+parseInt(target.getAttribute("id")));
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    await chrome.scripting.executeScript({
+        world: 'MAIN',
+        target: { tabId: tab.id },
+        files: ['sendvoto.js']
+    });
+    window.close();
+
 }
