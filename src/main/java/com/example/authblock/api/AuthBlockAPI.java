@@ -71,7 +71,7 @@ public class AuthBlockAPI {
       InfoAccessoUtente infoAccessoUtente;
         try {
             infoAccessoUtente = new InfoAccessoUtente.InfoAccessoUtenteBuilder()
-                    .setUrl(UtilsCrypto.checkData(data.getString("url"), hmac.getString("url"))).build();
+                    .setUrl(UtilsCrypto.checkDataCrypt(data.getString("url"), hmac.getString("url"))).build();
         } catch (Exception e) {
             return "{field:\"user data\"}";
         }
@@ -82,12 +82,12 @@ public class AuthBlockAPI {
             if(newUser)
                 infoAccessoSito = new InfoAccessoSito.InfoAccessoSitoBuilder()
                     .setUsernameUtente(UtilsCrypto.checkData(data.getString("username"), hmac.getString("username")))
-                    .setUserAgent(UtilsCrypto.checkData(data.getString("userAgent"), hmac.getString("userAgent")))
-                    .setIpAddress(UtilsCrypto.checkData(data.getString("ipAddress"), hmac.getString("ipAddress"))).build();
+                    .setUserAgent(UtilsCrypto.checkDataCrypt(data.getString("userAgent"), hmac.getString("userAgent")))
+                    .setIpAddress(UtilsCrypto.checkDataCrypt(data.getString("ipAddress"), hmac.getString("ipAddress"))).build();
             else
                 infoAccessoSito = new InfoAccessoSito.InfoAccessoSitoBuilder()
-                        .setUserAgent(UtilsCrypto.checkData(data.getString("userAgent"), hmac.getString("userAgent")))
-                        .setIpAddress(UtilsCrypto.checkData(data.getString("ipAddress"), hmac.getString("ipAddress"))).build();
+                        .setUserAgent(UtilsCrypto.checkDataCrypt(data.getString("userAgent"), hmac.getString("userAgent")))
+                        .setIpAddress(UtilsCrypto.checkDataCrypt(data.getString("ipAddress"), hmac.getString("ipAddress"))).build();
         } catch (Exception e) {
             return "{field:\"data site\"}";
         }

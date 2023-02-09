@@ -72,6 +72,14 @@ public class UtilsCrypto {
         return dataDec;
     }
 
+    public static String checkDataCrypt(String dataEnc, String hmacEnc) throws Exception {
+        String dataDec = decryptRSA(dataEnc);
+        if(!decryptRSA(hmacEnc).equals(hmac(dataDec)))
+            throw new Exception("{error:\"hmac failed\"}");
+        return dataEnc;
+    }
+
+
     private static String hmac(String data) throws Exception {
 
         SecretKeySpec secretKeySpec = new SecretKeySpec(keyMAC.getBytes(), algorithm);

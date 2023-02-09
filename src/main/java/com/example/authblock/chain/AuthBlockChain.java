@@ -22,7 +22,7 @@ import java.util.Locale;
 
 public class AuthBlockChain {
 
-    private static final String addressContract = "0x82e2D7CC6eBf64C7C702932273216174848f2957";
+    private static final String addressContract = "0x4F024F8b38EB7620525340A4F85342a4bfC729a2";
     private static final Credentials credentials = Credentials.create("76db681dd18e4e0f8cb78d538823a6333cf24bd3add56d16a8c33f04e970fb12");
     private static Contracts_AuthBlockFull_sol_AuthBlockFull contract;
     private static final String url = "http://172.18.80.1:7545";
