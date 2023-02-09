@@ -4,7 +4,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class InfoAccessoUtente {
-    private String oraLogin, oraLogout, url;
+    private String  oraLogin;
+    private String oraLogout;
+
+    private String url;
+    private InfoAccessoUtente( String url){
+        this.url = url;
+    }
     private InfoAccessoUtente(String oraLogin, String oraLogout, String url){
         this.oraLogin = oraLogin;
         this.oraLogout = oraLogout;
@@ -27,6 +33,8 @@ public class InfoAccessoUtente {
         this.oraLogout = oraLogout;
     }
 
+
+
     public String getUrl() {
         return url;
     }
@@ -36,25 +44,16 @@ public class InfoAccessoUtente {
     }
 
     public ArrayList<String> getData(){
-        return new ArrayList<>(Arrays.asList(url, oraLogin, oraLogout));
+        return new ArrayList<>(Arrays.asList(url));
     }
 
 
     public static class InfoAccessoUtenteBuilder {
-        private String oraLogin, oraLogout, url;
+        private String  url;
 
         public InfoAccessoUtenteBuilder() {
         }
 
-        public InfoAccessoUtenteBuilder setOraLogin(String oraLogin) {
-            this.oraLogin = oraLogin;
-            return this;
-        }
-
-        public InfoAccessoUtenteBuilder setOraLogout(String oraLogout) {
-            this.oraLogout = oraLogout;
-            return this;
-        }
 
         public InfoAccessoUtenteBuilder setUrl(String url) {
             this.url = url;
@@ -62,7 +61,11 @@ public class InfoAccessoUtente {
         }
 
         public InfoAccessoUtente build() {
-            return new InfoAccessoUtente(url, oraLogin, oraLogout);
+            return new InfoAccessoUtente(url);
         }
+        public InfoAccessoUtente buildWithLoginLogout(String oraLogin, String oraLogout) {
+            return new InfoAccessoUtente(oraLogin, oraLogout,url);
+        }
+
     }
 }

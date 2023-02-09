@@ -1,14 +1,29 @@
-package com.example.authblock;
+package com.example.authblock.chain;
 
 import org.bouncycastle.jcajce.provider.digest.SHA3;
 import org.bouncycastle.util.encoders.Hex;
 
-import javax.crypto.KeyGenerator;
-import javax.crypto.SecretKey;
-import java.security.NoSuchAlgorithmException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+import java.util.TimeZone;
 
-public class Utils {
-    private AuthBlockAPI binEsa = new AuthBlockAPI();
+public class UtilsChain {
+
+    public static String secondsToStringDate(String seconds){
+        long millis =  Integer.parseInt(seconds) * 1000L;
+        Date date = new Date(millis);
+        SimpleDateFormat sdf = new SimpleDateFormat("EEEE d MMMM yyyy, h:mm", Locale.ITALIAN);
+        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+        String formattedDate = sdf.format(date);
+        System.out.println(formattedDate);
+        return formattedDate;
+    }
+
+    public static String truncateAddress(String address){
+        return address.substring(0,5)+"..."+address.substring(address.length()-5);
+    }
+
     /* input : Indirizzo
      * Uscita: vero o falso
      * scopo: convalidare un checksum un indirizzo Ethereum
@@ -20,12 +35,8 @@ public class Utils {
      * URL di riferimento: https://github.com/ethereum/EIPs/issues/55
      */
 
-    public String generatekey() throws NoSuchAlgorithmException {
-        KeyGenerator keyGen = KeyGenerator.getInstance("HmacSHA256");
-        keyGen.init(256); // for example
-        return binEsa.bytesToHex(keyGen.generateKey().getEncoded());
-    }
-    public static boolean isAddress(String addr) throws NoSuchAlgorithmException {
+
+    public static boolean isAddress(String addr){
         //Print for testing purpose and more verbose output
         System.out.println("Incoming Address " + addr);
 
