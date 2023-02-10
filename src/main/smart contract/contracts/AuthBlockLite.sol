@@ -19,17 +19,17 @@ contract AuthBlockLite {
     //associa a un indirizzo di un utente il voto che ha dato
     mapping(address => uint8) votoUtente;
     //inserisci voto
-    function insertVoto(address indirizzo, uint8 vot) public{
+    function insertVoto(uint8 vot) public{
         uint prodotto;
         require(vot > 1," Il voto e' troppo basso ");
         require(vot < 6,"IL voto e' magiore di 5");
-        if(votoUtente[indirizzo] != 0){
+        if(votoUtente[msg.sender] != 0){
             //add(10+20);
             prodotto = media * divisore;
-            prodotto -= votoUtente[indirizzo];
+            prodotto -= votoUtente[msg.sender];
             media = (prodotto + vot)/divisore;
         }else{
-            votoUtente[indirizzo] = vot;
+            votoUtente[msg.sender] = vot;
             media = (media * divisore) + vot;
             divisore++;
             media /= divisore;

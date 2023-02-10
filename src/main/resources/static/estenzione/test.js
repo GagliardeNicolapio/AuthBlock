@@ -39,7 +39,7 @@ ul.onclick = function(event) {
 
 document.addEventListener('DOMContentLoaded', function () {
     // Get button by ID
-	console.log("ereeee");
+	alert("caricato")
     var button = document.getElementById('enableEth');
     button.onclick = injectScript;
 	
@@ -66,7 +66,7 @@ async function injectScript() {
     await chrome.scripting.executeScript({
 	world: 'MAIN',
     target: { tabId: tab.id },
-    files: ['enableEthereum.js']
+    files: ['getAccount.js','enableEthereum.js']
     });
     window.close();
 }
@@ -79,7 +79,7 @@ async function injectVoto(){
     await chrome.scripting.executeScript({
         world: 'MAIN',
         target: { tabId: tab.id },
-        files: ['sendvoto.js']
+        files: ['web3.min.js','getAccount.js', 'sendvoto.js']
     });
     window.close();
 
