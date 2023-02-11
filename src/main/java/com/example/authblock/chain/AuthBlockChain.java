@@ -36,16 +36,10 @@ public class AuthBlockChain {
         return contract.checkUser(indirizzoSito,indirizzoUtente).send();
     }
 
-    private String readIdFromMap(String key) throws IOException {
-        HashMap<String, String> hashMap = readMap();
-        System.out.println("key: "+key.toLowerCase());
-        String value = hashMap.get(key.toLowerCase());
-        return value;
-    }
 
     public void insertLogout(String indirizzoSito, String indirizzoUtente) throws Exception {
         System.out.println("leggo da map: "+ indirizzoSito+","+indirizzoUtente);
-        String id[] = readIdFromMap(indirizzoSito+","+indirizzoUtente).split(",");
+        String id[] = MapLogoutDAO.readIdFromMap(indirizzoSito+","+indirizzoUtente).split(",");
 
         contract.insertLogout(indirizzoSito,indirizzoUtente, new BigInteger(id[0]), new BigInteger(id[1])).send();
     }
@@ -56,37 +50,8 @@ public class AuthBlockChain {
             String key = response.indirizzoSito + "," + response.indirizzoUtente;
             String value = response.idAccessoSito + "," + response.idAccessoUtente;
             System.out.println("inserisco insertAccesso: "+ key+"   "+ value);
-            insertInMap(key, value);
+            MapLogoutDAO.insertInMap(key, value);
         }
-    }
-
-    private void insertInMap(String key, String value) throws IOException{
-        HashMap<String,String> map = readMap();
-        map.put(key.toLowerCase(),value.toLowerCase());
-        writeMap(map);
-    }
-
-    private HashMap<String, String> readMap() throws IOException{
-        HashMap<String, String> hashMap;
-        try {
-
-            FileInputStream inputStream = new FileInputStream("src/main/java/com/example/authblock/mapLogoutRepository.txt");
-            ObjectInputStream objectInputStream = new ObjectInputStream(inputStream);
-            hashMap = (HashMap<String, String>) objectInputStream.readObject();
-            objectInputStream.close();
-            inputStream.close();
-        }catch (ClassNotFoundException | EOFException e ){
-            hashMap = new HashMap<>();
-        }
-        return hashMap;
-    }
-
-    private void writeMap(HashMap<String,String> map) throws IOException{
-        FileOutputStream fileOutputStream = new FileOutputStream("src/main/java/com/example/authblock/mapLogoutRepository.txt");
-        ObjectOutputStream objectOutputStream =  new ObjectOutputStream(fileOutputStream);
-        objectOutputStream.writeObject(map);
-        objectOutputStream.close();
-        fileOutputStream.close();
     }
 
     public void insertNewUser(String indirizzoSito, String indirizzoUtente, InfoAccessoSito infoAccessoSito, InfoAccessoUtente infoAccessoUtente) throws Exception {
@@ -98,7 +63,7 @@ public class AuthBlockChain {
           String value = response.idAccessoSito + "," + response.idAccessoUtente;
            System.out.println("inserisco insertNewUser: "+ key+"   "+ value);
 
-           insertInMap(key, value);
+           MapLogoutDAO.insertInMap(key, value);
        }
 
     }

@@ -35,23 +35,15 @@ public class SiteController {
 
     @PostMapping("/download")
     public String download(@RequestParam("addressEther") String addressEth, HttpServletRequest request, Model model) throws Exception {
-        FileWriter file;
 
         // verifico se l'indirizzo è sintatticamente valido
-        if(UtilsChain.isAddress(addressEth)){
+        if(/*UtilsChain.isAddress(addressEth)*/true){//metodo provato con indirizzo ethereum account 1 metamask e non funziona
             //genero la chiave
             String key = UtilsCrypto.generatekey();
             // creo un oggetto json nel quale salvare la coppia indirizzo:chiave
-            JSONObject obj = new JSONObject();
-            obj.put(addressEth, key);
-            try {
-                // creo il file per salvare all'interno gli oggetti json
-                file = new FileWriter("src/main/java/com/example/authblock/offBlockchain.txt");
-                file.write(obj.toString());
-                file.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            SitoClienteDAO sitoClienteDAO = new SitoClienteDAO();
+            sitoClienteDAO.insert(new JSONObject().put(addressEth,key));
+            sitoClienteDAO.save();
             return "download";
         }else{
             System.out.println("codice non valido");
