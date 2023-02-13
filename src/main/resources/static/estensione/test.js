@@ -39,7 +39,12 @@ ul.onclick = function(event) {
 
 document.addEventListener('DOMContentLoaded', function () {
     // Get button by ID
-	alert("caricato")
+    var button = document.getElementById('cron');
+    button.onclick = injectCronologia;
+
+	var button = document.getElementById('val');
+	button.onclick = injectMedia;
+
     var button = document.getElementById('enableEth');
     button.onclick = injectScript;
 	
@@ -50,13 +55,25 @@ document.addEventListener('DOMContentLoaded', function () {
     ul.onclick = injectVoto;
 
 });
-
+async function injectCronologia(){
+    var newURL = "hchrome-extension://dlelfiabhgkpfeieihkhdpkfnhgjdkhl/cronologia.html";
+    chrome.tabs.create({ url: newURL });
+}
+async function injectMedia(){
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    await chrome.scripting.executeScript({
+        world: 'MAIN',
+        target: { tabId: tab.id },
+        files: ['web3.min.js','getAccount.js','sendMedia.js']
+    });
+    window.close();
+}
 async function injectSendEth(){
 	 const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
     await chrome.scripting.executeScript({
 	world: 'MAIN',
     target: { tabId: tab.id },
-    files: ['sendEth.js']
+    files: ['web3.min.js','getAccount.js','sendAccess.js']
     });
     window.close();
 }
@@ -66,7 +83,7 @@ async function injectScript() {
     await chrome.scripting.executeScript({
 	world: 'MAIN',
     target: { tabId: tab.id },
-    files: ['getAccount.js','enableEthereum.js']
+    files: ['web3.min.js','getAccount.js','enableEthereum.js']
     });
     window.close();
 }

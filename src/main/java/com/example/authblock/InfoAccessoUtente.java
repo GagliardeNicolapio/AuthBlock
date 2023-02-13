@@ -8,6 +8,7 @@ public class InfoAccessoUtente {
     private String oraLogout;
 
     private String url;
+    public InfoAccessoUtente(){}
     private InfoAccessoUtente( String url){
         this.url = url;
     }

@@ -1,15 +1,14 @@
 pragma solidity ^0;
 pragma experimental ABIEncoderV2;
 import "@openzeppelin/contracts/utils/Strings.sol";
-
+import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
 contract AuthBlockLite {
-    uint media;
-    uint divisore;
+    uint256 media;
+    uint256 divisore;
 
     struct InfoAccesso{
         string host;
-        string oraLogin;//capire come non duplicare oraLogin e oreLogout
     }
 
 
@@ -17,33 +16,41 @@ contract AuthBlockLite {
     //associa a un indirizzo di un utente un array di struct che contengono le info dei siti visitati dall'utente
     mapping(address => InfoAccesso[]) infoAccessi;
     //associa a un indirizzo di un utente il voto che ha dato
-    mapping(address => uint8) votoUtente;
+    mapping(address => uint256) votoUtente;
     //inserisci voto
-    function insertVoto(uint8 vot) public{
-        uint prodotto;
-        require(vot > 1," Il voto e' troppo basso ");
+    function insertVoto(uint256 vot) public{
+        uint256 prodotto;
+        require(vot > 0," Il voto e' troppo basso ");
         require(vot < 6,"IL voto e' magiore di 5");
         if(votoUtente[msg.sender] != 0){
-            //add(10+20);
-            prodotto = media * divisore;
-            prodotto -= votoUtente[msg.sender];
-            media = (prodotto + vot)/divisore;
+            //  prodotto = media * divisore;
+            prodotto = SafeMath.mul(media,divisore);
+            // prodotto -= votoUtente[msg.sender];
+            prodotto = SafeMath.sub(prodotto,votoUtente[msg.sender]);
+            // (prodotto + vot)/divisore;
+            media = SafeMath.add(prodotto,vot);
+            //divisore
+            media = SafeMath.div(media,divisore);
         }else{
             votoUtente[msg.sender] = vot;
-            media = (media * divisore) + vot;
-            divisore++;
-            media /= divisore;
+            //media = (media * divisore) + vot;
+            media = SafeMath.mul(media,divisore);
+            media = SafeMath.add(media,vot);
+            //divisore++;
+            divisore = SafeMath.add(divisore,1);
+            //media /= divisore;
+            media = SafeMath.div(media,divisore);
         }
     }
     // media
     function getMedia() public view returns(uint){
-        return media;
+        return 56;
     }
     //nota: passare le strutture come parametro è una cosa sperimentale, infatti bisogna usare pragma experimental ABIEncoderV2; e NON funziona
-    function insertAccesso(address indirizzo, string[] memory _dataInfoAccesso) public payable{
+    function insertAccesso(address indirizzo, string[] memory _accesso) public payable{
         require(msg.value>=0.0005 ether, "error sender");
         // isAccount(indirizzo), "Error address");
-        InfoAccesso memory infoAccesso = InfoAccesso(_dataInfoAccesso[0],_dataInfoAccesso[1]);
+        InfoAccesso memory infoAccesso = InfoAccesso(_accesso);
         infoAccessi[indirizzo].push(infoAccesso);
     }
     // prende l'indirizzo e torna l'array json di accessi associati a quell'indirizzo
