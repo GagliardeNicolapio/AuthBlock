@@ -13,7 +13,7 @@ import java.io.IOException;
 @Controller
 @RequestMapping(value = "")
 public class SiteController {
-    @GetMapping("")
+    @GetMapping({"", "index.html", "index"})
     public String home(){
         return "index";
     }
@@ -34,7 +34,7 @@ public class SiteController {
 
 
     @PostMapping("/download")
-    public String download(@RequestParam("addressEther") String addressEth, HttpServletRequest request, Model model) throws Exception {
+    public String download(@RequestParam("addressEther") String addressEth, Model model) throws Exception {
 
         // verifico se l'indirizzo è sintatticamente valido
         if(/*UtilsChain.isAddress(addressEth)*/true){//metodo provato con indirizzo ethereum account 1 metamask e non funziona
@@ -44,6 +44,7 @@ public class SiteController {
             SitoClienteDAO sitoClienteDAO = new SitoClienteDAO();
             sitoClienteDAO.insert(new JSONObject().put(addressEth,key));
             sitoClienteDAO.save();
+            model.addAttribute("key", key);
             return "download";
         }else{
             System.out.println("codice non valido");

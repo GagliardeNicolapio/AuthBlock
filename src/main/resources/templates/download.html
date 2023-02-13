@@ -12,7 +12,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="viewport" content="initial-scale=1, maximum-scale=1">
     <!-- site metas -->
-    <title>selo</title>
+    <title>AuthBlock | Download</title>
     <meta name="keywords" content="">
     <meta name="description" content="">
     <meta name="author" content="">
@@ -23,7 +23,8 @@
     <!-- Responsive-->
     <link rel="stylesheet" th:href="@{/auth_block_site/css/responsive.css}">
     <!-- fevicon -->
-    <link rel="icon" th:href="@{/auth_block_site/images/fevicon.png}" type="image/gif" />
+    <link rel="icon" th:href="@{/auth_block_dashboard/img/cube.png}" type="image/gif" />
+
     <!-- Scrollbar Custom CSS -->
     <link rel="stylesheet" th:href="@{/auth_block_site/css/jquery.mCustomScrollbar.min.css}">
     <!-- Tweaks for older IEs-->
@@ -32,14 +33,19 @@
     <!--[if lt IE 9]>
     <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
     <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script><![endif]-->
+    <style>
+        .make-snippet{
+            background-color: #1b1e21;
+            color: white;
+            border-radius: 5px;
+            padding:20px;
+            margin:20px;
+        }
+    </style>
 </head>
 <!-- body -->
 <body class="main-layout inner_header contact_page">
-<!-- loader  -->
-<div class="loader_bg">
-    <div class="loader"><img th:src="@{/auth_block_site/images/loading.gif}" alt="#" /></div>
-</div>
-<!-- end loader -->
+
 <!-- header -->
 <header>
     <!-- header inner -->
@@ -110,10 +116,10 @@
 </div>
 
 <!--  contact -->
-<div class="contact">
+<div class>
     <div class="container">
         <div class="row">
-            <div class="col-md-6">
+            <div class="col-md-12">
                 <p>In questa pagina verrà mostrato come implementare AuthBlock in pochi semplici passaggi.<br>
 
                 <ol>
@@ -122,10 +128,34 @@
                             <img th:src="@{/auth_block_site/images/imagejar.png}" alt="jar" width="104" height="142">
                         </a>
                     </li>
-                    <li>chi lo sa</li>
-                    <li>sicuramnete non te lo dirò</li>
-                </ol>
+                    <li>2° step: utilizza questa chiave HMAC: <span th:text="${key}"></span></li>
+                    <li>3° step:
+                        <div class="make-snippet">
+                            //crea un oggetto AuthBlockClientAPI<br>
+                            <span style="color:blue;">AuthBlockClientAPI</span> <span style="color: mediumpurple">authBlockClientAPI</span>  = <span style="color: orangered">new</span> <span style="color: aqua">AuthBlockClientAPI</span>(<span style="color: mediumpurple">"chiaveHMAC"</span>, <span style="color: mediumpurple">"ilTuoIndirizzoEthereum"</span>, <span style="color: mediumpurple">"www.iltuosito.com"</span>);
+                        </div>
+                        <div class="make-snippet">
+                            //per inserire un nuovo utente<br>
+                            <span style="color:blue;">AuthBlockClientAPI.Access</span>  <span style="color: mediumpurple">access</span> = <span style="color: mediumpurple">authBlockClientAPI</span>.<span style="color: orangered">new</span> <span style="color: aqua">Access()</span><br>
+                                .<span style="color: aqua">setEthereumUser</span>(<span style="color: peru">indirizzoEthereumDellUtente</span>)<br>
+                                .<span style="color: aqua">setUsername</span>(<span style="color: peru">usernameDellUtente</span>)<br>
+                                .<span style="color: aqua">setUserAgent</span>(<span style="color: peru">userAgentDellUtente</span>)<br>
+                                .<span style="color: aqua">setIpAddress</span>(<span style="color: peru">indirizzoIPDellUtente</span>);<br><br>
 
+                            <span style="color: mediumpurple">authBlockClientAPI</span>.<span style="color: aqua">insertNewUser</span>(<span style="color: mediumpurple">access</span>);
+                        </div>
+                        <div class="make-snippet">
+                            //per inserire un accesso<br>
+                            <span style="color:blue;">AuthBlockClientAPI.Access</span>  <span style="color: mediumpurple">access</span> = <span style="color: mediumpurple">authBlockClientAPI</span>.<span style="color: orangered">new</span> <span style="color: aqua">Access()</span><br>
+                            .<span style="color: aqua">setEthereumUser</span>(<span style="color: peru">indirizzoEthereumDellUtente</span>)<br>
+                            .<span style="color: aqua">setUserAgent</span>(<span style="color: peru">userAgentDellUtente</span>)<br>
+                            .<span style="color: aqua">setIpAddress</span>(<span style="color: peru">indirizzoIPDellUtente</span>);<br><br>
+
+                            <span style="color: mediumpurple">authBlockClientAPI</span>.<span style="color: aqua">insertAccess</span>(<span style="color: mediumpurple">access</span>);
+
+                        </div>
+                    </li>
+                </ol>
 
                 </p>
             </div>
@@ -133,60 +163,25 @@
     </div>
 </div>
 <!-- end contact -->
-<!--  footer -->
 <footer>
     <div class="footer">
         <div class="container">
-            <div class="row">
+            <div class="row" style="justify-content: center;">
                 <div class="col-xl-3 col-lg-3 col-md-6 col-sm-6">
-                    <img class="logo1" th:src="@{/auth_block_site/images/logo1.png}" alt="#"/>
-                    <ul class="about_us">
-                        <li>dolor sit amet, consectetur<br> magna aliqua. Ut enim ad <br>minim veniam, <br> quisdotempor incididunt r</li>
-                    </ul>
-                    <ul class="social_icon">
-                        <li><a href="#"><i class="fa fa-facebook" aria-hidden="true"></i></a></li>
-                        <li><a href="#"><i class="fa fa-twitter" aria-hidden="true"></i></a></li>
-                        <li><a href="#"><i class="fa fa-linkedin-square" aria-hidden="true"></i></a></li>
-                        <li><a href="#"><i class="fa fa-instagram" aria-hidden="true"></i></a></li>
-                    </ul>
-                </div>
-                <div class="col-xl-3 col-lg-3 col-md-6 col-sm-6">
-                    <h3>Useful Link</h3>
+                    <img class="logo1"  th:src="@{/auth_block_site/images/logo.png}" alt="#"/>
                     <ul class="link_menu">
-                        <li><a href="#">About Us</a></li>
-                        <li><a href="#">About services</a></li>
-                        <li><a href="#">About Departments</a></li>
-                        <li><a href="#">Services</a></li>
-                        <li><a href="#">Contact Us</a></li>
+                        <li><p style="color:white;">Zero passwords <br> Infiniti logins</p></li>
                     </ul>
                 </div>
                 <div class="col-xl-3 col-lg-3 col-md-6 col-sm-6">
-                    <h3>The Services</h3>
-                    <ul class="link_menu">
-                        <li><a href="#">About Us</a></li>
-                        <li><a href="#">About services</a></li>
-                        <li><a href="#">About Departments</a></li>
-                        <li><a href="#">Services</a></li>
-                        <li><a href="#">Contact Us</a></li>
+
+                    <ul class="link_menu" id="footerMenu">
+                        <li><a href="index.html#about">About - </a></li>
+                        <li><a href="index.html#servizi">Servizi - </a></li>
+                        <li><a href="index.html#Le_nostre_API">Le nostre API - </a></li>
                     </ul>
                 </div>
-                <div class="col-xl-3 col-lg-3 col-md-6 col-sm-6">
-                    <h3>Contact Us</h3>
-                    <ul class="link_menu">
-                        <li><a href="#">About Us</a></li>
-                        <li><a href="#">About services</a></li>
-                        <li><a href="#">About Departments</a></li>
-                        <li><a href="#">Services</a></li>
-                        <li><a href="#">Contact Us</a></li>
-                    </ul>
-                </div>
-                <div class="col-md-8 offset-md-4 ">
-                    <form class="bottom_form">
-                        <h3>Newsletter</h3>
-                        <input class="enter" placeholder="Enter your email" type="text" name="Enter your email">
-                        <button class="sub_btn">subscribe</button>
-                    </form>
-                </div>
+
             </div>
         </div>
         <div class="copyright">
@@ -200,7 +195,7 @@
         </div>
     </div>
 </footer>
-<!-- end footer -->
+
 <!-- Javascript files-->
 <script th:src="@{/auth_block_site/js/jquery.min.js}"></script>
 

@@ -4,68 +4,65 @@ import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
 contract AuthBlockLite {
-    uint256 media;
-    uint256 divisore;
 
     struct InfoAccesso{
         string host;
+        uint oraLogin;
     }
 
 
-
-    //associa a un indirizzo di un utente un array di struct che contengono le info dei siti visitati dall'utente
+    //associa a un indirizzo di un utente/sito web un array di struct InfoAccesso
     mapping(address => InfoAccesso[]) infoAccessi;
-    //associa a un indirizzo di un utente il voto che ha dato
-    mapping(address => uint256) votoUtente;
+
+
+    uint sommaVoti;
+    uint numeroVoti;
+
+    //associa a un indirizzo di un utente/sito web il voto che ha dato
+    mapping(address => uint8) voti;
+
+
     //inserisci voto
-    function insertVoto(uint256 vot) public{
-        uint256 prodotto;
-        require(vot > 0," Il voto e' troppo basso ");
-        require(vot < 6,"IL voto e' magiore di 5");
-        if(votoUtente[msg.sender] != 0){
-            //  prodotto = media * divisore;
-            prodotto = SafeMath.mul(media,divisore);
-            // prodotto -= votoUtente[msg.sender];
-            prodotto = SafeMath.sub(prodotto,votoUtente[msg.sender]);
-            // (prodotto + vot)/divisore;
-            media = SafeMath.add(prodotto,vot);
-            //divisore
-            media = SafeMath.div(media,divisore);
+    function insertVoto(uint8 nuovoVoto) public{
+
+        require(nuovoVoto >= 1," Il voto e' troppo basso ");
+        require(nuovoVoto <= 5,"IL voto e' maggiore di 5");
+
+        if(voti[msg.sender] != 0){
+            sommaVoti = SafeMath.add(SafeMath.sub(sommaVoti, voti[msg.sender]), nuovoVoto);
         }else{
-            votoUtente[msg.sender] = vot;
-            //media = (media * divisore) + vot;
-            media = SafeMath.mul(media,divisore);
-            media = SafeMath.add(media,vot);
-            //divisore++;
-            divisore = SafeMath.add(divisore,1);
-            //media /= divisore;
-            media = SafeMath.div(media,divisore);
+            sommaVoti = SafeMath.add(sommaVoti, nuovoVoto);
+            numeroVoti = SafeMath.add(numeroVoti, 1);
         }
+        voti[msg.sender] = nuovoVoto;
     }
     // media
     function getMedia() public view returns(uint){
-        return 56;
+        return SafeMath.div(SafeMath.mul(1000, sommaVoti), numeroVoti);
     }
-    //nota: passare le strutture come parametro è una cosa sperimentale, infatti bisogna usare pragma experimental ABIEncoderV2; e NON funziona
-    function insertAccesso(address indirizzo, string[] memory _accesso) public payable{
+
+
+    function insertAccesso(string memory host) public payable{
         require(msg.value>=0.0005 ether, "error sender");
         // isAccount(indirizzo), "Error address");
-        InfoAccesso memory infoAccesso = InfoAccesso(_accesso);
-        infoAccessi[indirizzo].push(infoAccesso);
+        InfoAccesso memory infoAccesso = InfoAccesso(host,block.timestamp);
+        infoAccessi[msg.sender].push(infoAccesso);
     }
+
     // prende l'indirizzo e torna l'array json di accessi associati a quell'indirizzo
-    function getInfoAccesso(address indirizzo) public view returns(string memory){
-        require(infoAccessi[indirizzo].length > 0, "non ha effettuato nessun accesso");
-        string memory data = string.concat("[",accessoSitoToString(infoAccessi[indirizzo][0]));
-        for(uint i=1; i<infoAccessi[indirizzo].length; i++){
-            data = string.concat(data,",",accessoSitoToString(infoAccessi[indirizzo][i]));
+    function getInfoAccesso() public view returns(string memory){
+        require(infoAccessi[msg.sender].length > 0, "nessun accesso trovato");
+        string memory data = string.concat("[",accessoSitoToString(infoAccessi[msg.sender][0]));
+        for(uint i=1; i<infoAccessi[msg.sender].length; i++){
+            data = string.concat(data,",",accessoSitoToString(infoAccessi[msg.sender][i]));
         }
         data = string.concat(data,"]");
         return data;
     }
+
     //converte un InfoAccessoSito in json
     function accessoSitoToString(InfoAccesso memory _accesso) private pure returns(string memory){
-        return string.concat('{oraLogin:"', _accesso.oraLogin,'", host:"',_accesso.host,'"}');
+        return string.concat('{oraLogin:"', Strings.toString(_accesso.oraLogin),'", host:"',_accesso.host,'"}');
     }
 
 
