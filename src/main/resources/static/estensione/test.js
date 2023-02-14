@@ -38,23 +38,35 @@ ul.onclick = function(event) {
 
 
 document.addEventListener('DOMContentLoaded', function () {
+
+    injectContract()
+    //document.getElementsByTagName("body")[0].onload = injectContract;
+
     // Get button by ID
-    var button = document.getElementById('cron');
-    button.onclick = injectCronologia;
+    document.getElementById('cron').onclick = injectCronologia;
 
-	var button = document.getElementById('val');
-	button.onclick = injectMedia;
 
-    var button = document.getElementById('enableEth');
-    button.onclick = injectScript;
+	document.getElementById('val').onclick = injectMedia;
+
+    document.getElementById('enableEth').onclick = injectScript;
+
 	
-	var button = document.getElementById('sendEth');
-	button.onclick = injectSendEth;
+	document.getElementById('sendEth').onclick = injectSendEth;
 
-    var ul = document.getElementById('media');
-    ul.onclick = injectVoto;
 
+    document.getElementById('media').onclick = injectVoto;
 });
+
+async function injectContract(){
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    await chrome.scripting.executeScript({
+        world: 'MAIN',
+        target: { tabId: tab.id },
+        files: ['web3.min.js','getAccount.js','contract.js']
+    });
+   // window.close();
+}
+
 async function injectCronologia(){
     var newURL = "hchrome-extension://dlelfiabhgkpfeieihkhdpkfnhgjdkhl/cronologia.html";
     chrome.tabs.create({ url: newURL });
@@ -64,7 +76,7 @@ async function injectMedia(){
     await chrome.scripting.executeScript({
         world: 'MAIN',
         target: { tabId: tab.id },
-        files: ['web3.min.js','getAccount.js','sendMedia.js']
+        files: ['getMedia.js']
     });
     window.close();
 }
@@ -88,16 +100,89 @@ async function injectScript() {
     window.close();
 }
 
-
+/*
 async function injectVoto(){
     var target = event.target;
-    alert("Il voto inserito is: "+parseInt(target.getAttribute("id")));
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    let voto = parseInt(target.getAttribute("id"))
+    alert(voto);
+
     await chrome.scripting.executeScript({
+
         world: 'MAIN',
         target: { tabId: tab.id },
-        files: ['web3.min.js','getAccount.js', 'sendvoto.js']
+        files: ['sendvoto.js']
+    });
+    window.close();
+
+}*/
+
+
+
+
+//test
+async function injectVoto(){
+    var target = event.target;
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    let voto = parseInt(target.getAttribute("id"))
+    alert(voto);
+
+    await chrome.scripting.executeScript({
+
+        world: 'MAIN',
+        target: { tabId: tab.id },
+        args: [voto],
+        func: prova
+
     });
     window.close();
 
 }
+
+
+
+
+
+function prova(numero) {
+    function voto(numero,account) {
+        alert("numero da voto: "+numero)
+
+        var myContract = new web3.eth.Contract(abi, addressContract, {
+            from: account,
+            gasPrice: '2000000',
+            gas: 1000000,
+            data: bin
+        })
+
+        console.log(addressContract)
+        console.log(account)
+
+        console.log(myContract)
+
+        //da decommenmy
+        myContract.methods.insertVoto(numero).send({from: account}).then((receipt) => {
+            console.log('receipt insertvoto: ' + receipt)
+        })
+
+        //test
+        //let accesso = ['google.com','23:30']
+        //myContract.methods.insertAccesso(account,accesso).send({from:account, value:700000000000000}).then(function(receipt){console.log('pippo'+receipt)})
+    }
+    console.log("prova")
+    if (typeof account === 'undefined') {
+        console.log("prova if")
+
+        var account;
+        getAccount(voto,numero)
+
+    } else {
+        console.log("prova else")
+
+        voto(numero)
+    }
+
+
+
+
+}
+
