@@ -13,6 +13,12 @@ import java.io.IOException;
 @Controller
 @RequestMapping(value = "")
 public class SiteController {
+
+    @GetMapping({"testShowData"})
+    public String dashBoardLite(){
+        return "testShowData";
+    }
+
     @GetMapping({"", "index.html", "index"})
     public String home(){
         return "index";
