@@ -68,7 +68,7 @@ async function injectContract(){
 }
 
 async function injectCronologia(){
-    var newURL = "hchrome-extension://dlelfiabhgkpfeieihkhdpkfnhgjdkhl/cronologia.html";
+    var newURL = "localhost:8080/dashboardLite";
     chrome.tabs.create({ url: newURL });
 }
 async function injectMedia(){
@@ -117,7 +117,9 @@ async function injectVoto(){
 
 }*/
 
-
+function scrivi(resultsArray){
+    console.log("resultsARRR: "+resultsArray)
+}
 
 
 //test
@@ -133,7 +135,6 @@ async function injectVoto(){
         target: { tabId: tab.id },
         args: [voto],
         func: prova
-
     });
     window.close();
 
@@ -181,8 +182,8 @@ function prova(numero) {
         voto(numero)
     }
 
-
-
+    console.log("fine")
+    return "pippo";
 
 }
 

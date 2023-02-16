@@ -49,6 +49,10 @@ contract AuthBlockLite {
         infoAccessi[msg.sender].push(infoAccesso);
     }
 
+    function getNumAccessi() public view returns(uint){
+        return infoAccessi[msg.sender].length;
+    }
+
     // prende l'indirizzo e torna l'array json di accessi associati a quell'indirizzo
     function getInfoAccesso() public view returns(string memory){
         require(infoAccessi[msg.sender].length > 0, "nessun accesso trovato");
@@ -62,7 +66,7 @@ contract AuthBlockLite {
 
     //converte un InfoAccessoSito in json
     function accessoSitoToString(InfoAccesso memory _accesso) private pure returns(string memory){
-        return string.concat('{oraLogin:"', Strings.toString(_accesso.oraLogin),'", host:"',_accesso.host,'"}');
+        return string.concat('{"oraLogin":"', Strings.toString(_accesso.oraLogin),'", "host":"',_accesso.host,'"}');
     }
 
 

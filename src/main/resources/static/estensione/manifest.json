@@ -5,6 +5,8 @@
   "version": "1.0",
   "web_accessible_resources": [{"resources":["js/**/*"], "matches":["<all_urls>"]}],
   "permissions": ["scripting","activeTab", "storage","contextMenus","tabs"],
+
+
   "action":{
             "default_popup":"main.html",
             "default_icon": "logoex.png"

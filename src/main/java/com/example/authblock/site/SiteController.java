@@ -14,9 +14,9 @@ import java.io.IOException;
 @RequestMapping(value = "")
 public class SiteController {
 
-    @GetMapping({"testShowData"})
+    @GetMapping({"dashboardLite"})
     public String dashBoardLite(){
-        return "testShowData";
+        return "dashboardLite";
     }
 
     @GetMapping({"", "index.html", "index"})
