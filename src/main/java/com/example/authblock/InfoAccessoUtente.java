@@ -7,6 +7,15 @@ public class InfoAccessoUtente {
     private String  oraLogin;
     private String oraLogout;
 
+    @Override
+    public String toString() {
+        return "InfoAccessoUtente{" +
+                "oraLogin='" + oraLogin + '\'' +
+                ", oraLogout='" + oraLogout + '\'' +
+                ", url='" + url + '\'' +
+                '}';
+    }
+
     private String url;
     public InfoAccessoUtente(){}
     private InfoAccessoUtente( String url){
@@ -45,6 +54,7 @@ public class InfoAccessoUtente {
     }
 
     public ArrayList<String> getData(){
+        System.out.println("URL: "+url);
         return new ArrayList<>(Arrays.asList(url));
     }
 

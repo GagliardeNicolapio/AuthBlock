@@ -4,6 +4,7 @@ import com.example.authblock.InfoAccessoSito;
 import com.example.authblock.InfoAccessoUtente;
 import com.example.authblock.chain.AuthBlockChain;
 import com.example.authblock.cryptography.UtilsCrypto;
+import org.apache.tomcat.util.log.SystemLogHandler;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.web.bind.annotation.*;
@@ -11,10 +12,10 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 
 //NOTA: dovremmo cifrare anche i return
+
 @RestController
 @RequestMapping(value = "/api", method = POST)
 public class AuthBlockAPI {
-
     @PostMapping(value = "/logout", produces = "application/json")
     public @ResponseBody String logout(@RequestBody String body) throws Exception {
         JSONObject object = new JSONObject(body);
@@ -79,12 +80,13 @@ public class AuthBlockAPI {
         //controllo oraLogin, logout, username, useragent e ip
         InfoAccessoSito infoAccessoSito;
         try {
-            if(newUser)
+            if(newUser) {
+                System.out.println("***" + UtilsCrypto.checkData(data.getString("username"), hmac.getString("username")));
                 infoAccessoSito = new InfoAccessoSito.InfoAccessoSitoBuilder()
-                    .setUsernameUtente(UtilsCrypto.checkData(data.getString("username"), hmac.getString("username")))
-                    .setUserAgent(UtilsCrypto.checkDataCrypt(data.getString("userAgent"), hmac.getString("userAgent")))
-                    .setIpAddress(UtilsCrypto.checkDataCrypt(data.getString("ipAddress"), hmac.getString("ipAddress"))).build();
-            else
+                        .setUsernameUtente(UtilsCrypto.checkData(data.getString("username"), hmac.getString("username")))
+                        .setUserAgent(UtilsCrypto.checkDataCrypt(data.getString("userAgent"), hmac.getString("userAgent")))
+                        .setIpAddress(UtilsCrypto.checkDataCrypt(data.getString("ipAddress"), hmac.getString("ipAddress"))).build();
+            } else
                 infoAccessoSito = new InfoAccessoSito.InfoAccessoSitoBuilder()
                         .setUserAgent(UtilsCrypto.checkDataCrypt(data.getString("userAgent"), hmac.getString("userAgent")))
                         .setIpAddress(UtilsCrypto.checkDataCrypt(data.getString("ipAddress"), hmac.getString("ipAddress"))).build();

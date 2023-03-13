@@ -27,7 +27,10 @@ public class AuthBlockApplication {
     private static final char[] HEX_ARRAY = "0123456789ABCDEF".toCharArray();
     public static void main(String[] args) {
 
-        SpringApplication.run(AuthBlockApplication.class, args);}
+        SpringApplication.run(AuthBlockApplication.class, args);
+
+
+    }
 
     private String bytesToHex(byte[] bytes) {
         char[] hexChars = new char[bytes.length * 2];

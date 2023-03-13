@@ -117,11 +117,11 @@
          <div class="container">
             <div class="row">
                <div class="col-md-6">
-                 <form id="request" class="main_form" action ="/download" method="post">
+                 <form id="request" class="main_form" action ="/download" method="post" onlick="pagamentoFull()">
                     <div class="row">
                        <span th:if="${flag == true}"><p style="color:red; size: A4">Errore di inserimento del indirizzo ethereum</p></span>
                         <div class="col-md-12 ">
-                           <input id="addressEther" class="contactus" placeholder="indirizzo Ethereum" type="type" name="addressEther">
+                           <input required id="addressEther" class="contactus" placeholder="indirizzo Ethereum" type="type" name="addressEther">
                         </div>
                        <label for="metamask">Oppure usa MetaMask</label>
                        <img th:src="@{/auth_block_site/images/metamask.png}" id="metamask" onclick="loginWithEth()" style="width: 35px;cursor: pointer;">

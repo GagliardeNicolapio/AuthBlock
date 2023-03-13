@@ -2,35 +2,31 @@ package com.example.authblock.chain;
 
 import com.example.authblock.InfoAccessoSito;
 import com.example.authblock.InfoAccessoUtente;
-import jnr.ffi.annotations.In;
+import com.example.authblock.cryptography.UtilsCrypto;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.web3j.crypto.Credentials;
-import org.web3j.crypto.Hash;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.http.HttpService;
 import org.web3j.tx.gas.DefaultGasProvider;
 import org.web3j.protocol.core.methods.response.Log;
-
-import java.io.*;
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Locale;
+
 
 public class AuthBlockChain {
 
-    private static final String addressContract = "0x4F024F8b38EB7620525340A4F85342a4bfC729a2";
-    private static final Credentials credentials = Credentials.create("76db681dd18e4e0f8cb78d538823a6333cf24bd3add56d16a8c33f04e970fb12");
-    private static Contracts_AuthBlockFull_sol_AuthBlockFull contract;
-    private static final String url = "http://172.18.80.1:7545";
+    private static final String addressContract = "0xB67186D8Ea413e2E7d4BBA04A6B3B443Dbc82591";
+    private static final Credentials credentials = Credentials.create("02fbeb026fbef5304ca485c2ad7b0a9b81b31eb1f04a17546c4d54748f25cf62");
+    public  Contracts_AuthBlockFull_sol_AuthBlockFull contract;
+    private static final String url = "http://0.0.0.0:7545";
 
 
     public AuthBlockChain(){
         contract = Contracts_AuthBlockFull_sol_AuthBlockFull.load(addressContract, Web3j.build(new HttpService(url)), credentials,new DefaultGasProvider());
+
     }
+
 
     public boolean checkUser(String indirizzoSito, String indirizzoUtente) throws Exception {
         return contract.checkUser(indirizzoSito,indirizzoUtente).send();
@@ -44,7 +40,27 @@ public class AuthBlockChain {
         contract.insertLogout(indirizzoSito,indirizzoUtente, new BigInteger(id[0]), new BigInteger(id[1])).send();
     }
 
+
+   /* public static final Event PAGAMENTO_EFFETTUATO_EVENT = new Event("PagamentoRicevuto",
+         Arrays.<TypeReference<?>>asList(new TypeReference<Address>(true) {}, new TypeReference<Int>(false) {}));
+    private static final String INCREMENT_EVENT_HASH = EventEncoder.encode(PAGAMENTO_EFFETTUATO_EVENT);
+
+    public void getPagamentoRicevutoEvents(){
+        EthFilter filter = new EthFilter(
+                DefaultBlockParameterName.EARLIEST, // From block 0
+                DefaultBlockParameterName.LATEST,  // To latest
+                "0x05eC8011d7B54129e0FeD376c4Cff4A91D9D2f15") // Unique Smart Contract
+                .addSingleTopic(INCREMENT_EVENT_HASH);
+
+        contract.pagamentoRicevutoEventFlowable(filter).subscribe(event ->{
+            System.out.println("TEST EVENT");
+            System.out.println(event.toString());
+        });
+    }*/
+
+
     public void insertAccesso(String indirizzoSito, String indirizzoUtente, InfoAccessoSito infoAccessoSito, InfoAccessoUtente infoAccessoUtente) throws Exception {
+
         for(Log log :  contract.insertAccesso(indirizzoSito, indirizzoUtente, infoAccessoSito.getData(), infoAccessoUtente.getData()).send().getLogs()){
             Contracts_AuthBlockFull_sol_AuthBlockFull.InserimentoAccessoFattoEventResponse response = contract.getInserimentoAccessoFattoEvents(log);
             String key = response.indirizzoSito + "," + response.indirizzoUtente;
@@ -55,7 +71,7 @@ public class AuthBlockChain {
     }
 
     public void insertNewUser(String indirizzoSito, String indirizzoUtente, InfoAccessoSito infoAccessoSito, InfoAccessoUtente infoAccessoUtente) throws Exception {
-        System.out.println("insetnewuser");
+        System.out.println("insetnewuser"+ infoAccessoSito.getData()+"  "+ infoAccessoUtente.getData());
 
        for(Log log : contract.insertUser(indirizzoSito, indirizzoUtente, infoAccessoSito.getData(), infoAccessoUtente.getData()).send().getLogs()){
           Contracts_AuthBlockFull_sol_AuthBlockFull.InserimentoAccessoFattoEventResponse response = contract.getInserimentoAccessoFattoEvents(log);
@@ -81,11 +97,21 @@ public class AuthBlockChain {
         JSONObject object = new JSONObject(data);
         return new InfoAccessoSito.InfoAccessoSitoBuilder()
                 .setUsernameUtente(object.getString("username"))
-                .setUserAgent(object.getString("userAgent"))
-                .setIpAddress(object.getString("ipAddress"))
+                .setUserAgent(UtilsCrypto.decryptRSA( object.getString("userAgent")))
+                .setIpAddress(UtilsCrypto.decryptRSA( object.getString("ipAddress")))
                 .buildWithLoginLogout(
                         UtilsChain.secondsToStringDate(object.getString("oraLogin")),
                         object.getString("oraLogout").equals("0") ? "0" : UtilsChain.secondsToStringDate(object.getString("oraLogout")));
+    }
+
+    public InfoAccessoUtente getInfoAccessoUtente(String indirizzoUtente, int numAccess) throws Exception {
+        String data =  contract.getInfoAccessoSito(indirizzoUtente, BigInteger.valueOf(numAccess)).send();
+        JSONObject obj = new JSONObject(data);
+        return new InfoAccessoUtente.InfoAccessoUtenteBuilder()
+                .setUrl(UtilsCrypto.decryptRSA(obj.getString("urlSito")))
+                .buildWithLoginLogout(
+                        UtilsChain.secondsToStringDate(obj.getString("oraLogin")),
+                        obj.getString("oraLogout").equals("0") ? "0" : UtilsChain.secondsToStringDate(obj.getString("oraLogout")));
     }
 
     public ArrayList<InfoAccessoSito> getInfoAccessoSito(String indirizzoSito, int start, int end) throws Exception {
@@ -98,8 +124,8 @@ public class AuthBlockChain {
             JSONObject obj = array.getJSONObject(i);
             lista.add(new InfoAccessoSito.InfoAccessoSitoBuilder()
                     .setUsernameUtente(obj.getString("username"))
-                    .setUserAgent(obj.getString("userAgent"))
-                    .setIpAddress(obj.getString("ipAddress"))
+                    .setUserAgent(UtilsCrypto.decryptRSA(obj.getString("userAgent")))
+                    .setIpAddress(UtilsCrypto.decryptRSA(obj.getString("ipAddress")))
                     .buildWithLoginLogout(
                             UtilsChain.secondsToStringDate(obj.getString("oraLogin")),
                             obj.getString("oraLogout").equals("0") ? "0" : UtilsChain.secondsToStringDate(obj.getString("oraLogout"))));
@@ -120,7 +146,7 @@ public class AuthBlockChain {
         for (int i=0; i < array.length(); i++) {
             JSONObject obj = array.getJSONObject(i);
             lista.add(new InfoAccessoUtente.InfoAccessoUtenteBuilder()
-                    .setUrl(obj.getString("urlSito"))
+                    .setUrl(UtilsCrypto.decryptRSA(obj.getString("urlSito")))
                     .buildWithLoginLogout(
                             UtilsChain.secondsToStringDate(obj.getString("oraLogin")),
                             obj.getString("oraLogout").equals("0") ? "0" : UtilsChain.secondsToStringDate(obj.getString("oraLogout"))));

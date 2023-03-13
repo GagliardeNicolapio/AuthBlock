@@ -8,7 +8,7 @@ function insertMedia(){
     var myContract = new web3.eth.Contract(abi, addressContract, {from: account, gasPrice:'2000000', gas:1000000, data:bin})
 
     myContract.methods.getMedia().call().then((receipt)=>{
-        console.log(receipt/1000)
+        alert('La media di questo sito è: '+receipt/1000)
     })
 }
 

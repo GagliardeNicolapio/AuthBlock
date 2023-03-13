@@ -6,6 +6,17 @@ import java.util.Arrays;
 public class InfoAccessoSito {
     private String oraLogin, oraLogout, usernameUtente, userAgentUtente, indirizzoIPUtente;
 
+    @Override
+    public String toString() {
+        return "InfoAccessoSito{" +
+                "oraLogin='" + oraLogin + '\'' +
+                ", oraLogout='" + oraLogout + '\'' +
+                ", usernameUtente='" + usernameUtente + '\'' +
+                ", userAgentUtente='" + userAgentUtente + '\'' +
+                ", indirizzoIPUtente='" + indirizzoIPUtente + '\'' +
+                '}';
+    }
+
     private InfoAccessoSito(String oraLogin, String oraLogout, String usernameUtente, String userAgentUtente, String indirizzoIPUtente) {
         this.oraLogin = oraLogin;
         this.oraLogout = oraLogout;
@@ -49,6 +60,7 @@ public class InfoAccessoSito {
     }
 
     public ArrayList<String> getData(){
+        System.out.println(usernameUtente+" "+ userAgentUtente+" "+ indirizzoIPUtente);
         return new ArrayList<>(Arrays.asList(usernameUtente, userAgentUtente, indirizzoIPUtente));
     }
 
@@ -58,6 +70,7 @@ public class InfoAccessoSito {
         public InfoAccessoSitoBuilder(){}
 
         public InfoAccessoSitoBuilder setUsernameUtente(String username){
+            System.out.println("set: "+username);
             this.usernameUtente = username;
             return this;
         }

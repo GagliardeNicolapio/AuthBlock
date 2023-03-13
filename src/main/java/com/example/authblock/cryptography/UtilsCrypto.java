@@ -48,8 +48,7 @@ public class UtilsCrypto {
         }
         return new String(hexChars);
     }
-
-    private static String decryptRSA(String data) throws Exception {
+    public static String decryptRSA(String data) throws Exception {
         File privateKeyFile = new File("private.key");
         byte[] privateKeyBytes = Files.readAllBytes(privateKeyFile.toPath());
 
@@ -64,22 +63,18 @@ public class UtilsCrypto {
         byte[] decryptedMessageBytes = decryptCipher.doFinal(test);
         return new String(decryptedMessageBytes, StandardCharsets.UTF_8);
     }
-
     public static String checkData(String dataEnc, String hmacEnc) throws Exception {
         String dataDec = decryptRSA(dataEnc);
         if(!decryptRSA(hmacEnc).equals(hmac(dataDec)))
             throw new Exception("{error:\"hmac failed\"}");
         return dataDec;
     }
-
     public static String checkDataCrypt(String dataEnc, String hmacEnc) throws Exception {
         String dataDec = decryptRSA(dataEnc);
         if(!decryptRSA(hmacEnc).equals(hmac(dataDec)))
             throw new Exception("{error:\"hmac failed\"}");
         return dataEnc;
     }
-
-
     private static String hmac(String data) throws Exception {
 
         SecretKeySpec secretKeySpec = new SecretKeySpec(keyMAC.getBytes(), algorithm);

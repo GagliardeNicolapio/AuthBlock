@@ -29,19 +29,20 @@ contract AuthBlockFull is Ownable{
 
     event InserimentoAccessoFatto(address indirizzoSito, address indirizzoUtente ,uint idAccessoSito, uint idAccessoUtente);
 
+
     //informazioni riguardo gli utenti del sito
     struct  InfoAccessoSito{
-        uint oraLogin; //ora login e logout dell'utente
+        uint oraLogin;
         uint oraLogout;
         string usernameUtente;
-        string userAgentUtente; //info del browser utente
+        string userAgentUtente;
         string indirizzoIPUtente;
     }
 
     //informazioni riguardo i siti visitati da un utente
     struct InfoAccessoUtente{
         string urlSito;
-        uint oraLogin;//capire come non duplicare oraLogin e oreLogout
+        uint oraLogin;
         uint oraLogout;
     }
 
@@ -57,6 +58,7 @@ contract AuthBlockFull is Ownable{
 
     //associa a un indirizzo di un utente un array di struct che contengono le info dei siti visitati dall'utente
     mapping(address => InfoAccessoUtente[]) infoPerUtenti;
+
 
 /*********************************************************************************************************************************************++
 Metodi invocabili solo da AuthBlock
@@ -78,7 +80,7 @@ Metodi invocabili solo da AuthBlock
     function insertUser(address _indirizzoSito, address _indirizzoUtente, string[] memory _dataInfoAccessoSito, string[] memory _dataInfoAccessoUtente) public onlyOwner{
         require(bytes(_dataInfoAccessoSito[2]).length > 0, "username non valida");
         // require(isAccount(indirizzoSito) && isAccount(indirizzoUtente), "Error address");
-        utentiDeiSiti[_indirizzoSito][_indirizzoUtente] = _dataInfoAccessoSito[2];
+        utentiDeiSiti[_indirizzoSito][_indirizzoUtente] = _dataInfoAccessoSito[0];
         insertAccesso(_indirizzoSito, _indirizzoUtente, _dataInfoAccessoSito, _dataInfoAccessoUtente);
     }
 
@@ -100,6 +102,11 @@ Metodi invocabili solo da AuthBlock
     function getInfoAccessoSito(address indirizzoSito, uint accessNumber) public view onlyOwner returns(string memory){
         InfoAccessoSito memory accesso = infoPerSitiWeb[indirizzoSito][accessNumber];
         return accessoSitoToString(accesso);
+    }
+
+    function getInfoAccessoUtente(address indirizzoUtente, uint accessNumber) public view onlyOwner returns(string memory){
+        InfoAccessoUtente memory accesso = infoPerUtenti[indirizzoUtente][accessNumber];
+        return accessoUtenteToString(accesso);
     }
 
     //ritorna gli accessi InfoAccessoSito dall'accesso start-esimo al end-esimo in array json
@@ -129,9 +136,20 @@ Metodi invocabili solo da AuthBlock
     }
 
 
-/*********************************************************************************************************************************************************
+
+  /*********************************************************************************************************************************************************
 Metodi invocabili da qualsiasi account/contratto
+Permottono a un utente di creare una propria dashboard
 *********************************************************************************************************************************************************/
+
+
+
+    //per il pagamento del servizio full
+    event PagamentoRicevuto(address indirizzoSito);
+    function pagamentoFull() public payable{
+        require(msg.value > 1 ether, "Bisogna pagare 1 ether");
+        emit PagamentoRicevuto(msg.sender);
+    }
 
     //ritorna il numero di accessi al sito
     function getNumberAccessiSito(address indirizzoSito) public view returns(uint){
@@ -154,7 +172,6 @@ Metodi invocabili da qualsiasi account/contratto
     }
 
 
-
 /*********************************************************************************************************************************************************
     Metodi privati
 *********************************************************************************************************************************************************/
@@ -168,8 +185,6 @@ Metodi invocabili da qualsiasi account/contratto
         return string.concat('{oraLogin:"', Strings.toString(_accesso.oraLogin),'", oraLogout:"', Strings.toString(_accesso.oraLogout), '", username:"',
             _accesso.usernameUtente,'", userAgent:"', _accesso.userAgentUtente,'", ipAddress:"', _accesso.indirizzoIPUtente,'"}');
     }
-
-
 
 
 
