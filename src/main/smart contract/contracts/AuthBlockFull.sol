@@ -110,7 +110,7 @@ Metodi invocabili solo da AuthBlock
     }
 
     //ritorna gli accessi InfoAccessoSito dall'accesso start-esimo al end-esimo in array json
-    function getInfoAccessoSitoRange(address indirizzoSito, uint start, uint end) public view onlyOwner returns(string memory){
+    /*function getInfoAccessoSitoRange(address indirizzoSito, uint start, uint end) public view onlyOwner returns(string memory){
         require(start < end, "start non e' minore di end");
         require(end <= infoPerSitiWeb[indirizzoSito].length, "end e' maggiore di lenght");
 
@@ -120,10 +120,10 @@ Metodi invocabili solo da AuthBlock
         }
         data = string.concat(data,"]");
         return data;
-    }
+    }*/
 
     //ritorna gli accessi InfoAccessoUtente dall'accesso start-esimo al end-esimo in array json
-    function getInfoAccessoUtentiRange(address indirizzoUtente, uint start, uint end) public view onlyOwner returns(string memory){
+    /*function getInfoAccessoUtentiRange(address indirizzoUtente, uint start, uint end) public view onlyOwner returns(string memory){
         require(start < end, "start non e' minore di end");
         require(end <= infoPerUtenti[indirizzoUtente].length, "end e' maggiore di lenght");
 
@@ -133,8 +133,7 @@ Metodi invocabili solo da AuthBlock
         }
         data = string.concat(data,"]");
         return data;
-    }
-
+    }*/
 
 
   /*********************************************************************************************************************************************************
@@ -146,10 +145,11 @@ Permottono a un utente di creare una propria dashboard
 
     //per il pagamento del servizio full
     event PagamentoRicevuto(address indirizzoSito);
-    function pagamentoFull() public payable{
-        require(msg.value > 1 ether, "Bisogna pagare 1 ether");
+    receive() external payable{
+        require(msg.value >= 1 ether, "Bisogna pagare 1 ether");
         emit PagamentoRicevuto(msg.sender);
     }
+
 
     //ritorna il numero di accessi al sito
     function getNumberAccessiSito(address indirizzoSito) public view returns(uint){

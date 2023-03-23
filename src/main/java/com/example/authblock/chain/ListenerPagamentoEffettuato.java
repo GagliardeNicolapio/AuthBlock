@@ -38,7 +38,7 @@ public class ListenerPagamentoEffettuato {
         EthFilter filter = new EthFilter(
                 DefaultBlockParameterName.EARLIEST, // From block 0
                 DefaultBlockParameterName.LATEST,  // To latest
-                "0x05eC8011d7B54129e0FeD376c4Cff4A91D9D2f15") // Unique Smart Contract
+                "0x6677a85BDeCf4b2c32266c23c6c16Ad4AB321d90") // Unique Smart Contract
                 .addSingleTopic(INCREMENT_EVENT_HASH);
 
         authBlockChain.contract.pagamentoRicevutoEventFlowable(filter).subscribe(event ->{

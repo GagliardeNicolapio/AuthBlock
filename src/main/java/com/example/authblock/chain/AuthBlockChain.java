@@ -16,7 +16,7 @@ import java.util.ArrayList;
 
 public class AuthBlockChain {
 
-    private static final String addressContract = "0xB67186D8Ea413e2E7d4BBA04A6B3B443Dbc82591";
+    private static final String addressContract = "0x6677a85BDeCf4b2c32266c23c6c16Ad4AB321d90";
     private static final Credentials credentials = Credentials.create("02fbeb026fbef5304ca485c2ad7b0a9b81b31eb1f04a17546c4d54748f25cf62");
     public  Contracts_AuthBlockFull_sol_AuthBlockFull contract;
     private static final String url = "http://0.0.0.0:7545";
@@ -105,7 +105,8 @@ public class AuthBlockChain {
     }
 
     public InfoAccessoUtente getInfoAccessoUtente(String indirizzoUtente, int numAccess) throws Exception {
-        String data =  contract.getInfoAccessoSito(indirizzoUtente, BigInteger.valueOf(numAccess)).send();
+        System.out.println("getinfoaccessoutente: "+indirizzoUtente+"  "+numAccess);
+        String data =  contract.getInfoAccessoUtente(indirizzoUtente, BigInteger.valueOf(numAccess)).send();
         JSONObject obj = new JSONObject(data);
         return new InfoAccessoUtente.InfoAccessoUtenteBuilder()
                 .setUrl(UtilsCrypto.decryptRSA(obj.getString("urlSito")))
@@ -114,7 +115,7 @@ public class AuthBlockChain {
                         obj.getString("oraLogout").equals("0") ? "0" : UtilsChain.secondsToStringDate(obj.getString("oraLogout")));
     }
 
-    public ArrayList<InfoAccessoSito> getInfoAccessoSito(String indirizzoSito, int start, int end) throws Exception {
+   /* public ArrayList<InfoAccessoSito> getInfoAccessoSito(String indirizzoSito, int start, int end) throws Exception {
         System.out.println("start:"+start);
         System.out.println("end:"+end);
         System.out.println("numAccess:"+getNumberAccessiSito(indirizzoSito));
@@ -132,9 +133,9 @@ public class AuthBlockChain {
         }
 
         return lista;
-    }
+    }*/
 
-    public ArrayList<InfoAccessoUtente> getInfoAccessoUtente(String indirizzoUtente, int start, int end) throws Exception {
+    /*public ArrayList<InfoAccessoUtente> getInfoAccessoUtente(String indirizzoUtente, int start, int end) throws Exception {
         System.out.println("start:"+ start);
         System.out.println("end: "+ end);
         System.out.println("num:"+ getNumberAccessiUtente(indirizzoUtente));
@@ -153,7 +154,7 @@ public class AuthBlockChain {
         }
 
         return lista;
-    }
+    }*/
 
     public boolean isPresent(String indirizzo) throws Exception {
         return contract.isPresent(indirizzo).send();
